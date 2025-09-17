@@ -13,6 +13,7 @@ import DepartmentSettings from "../pages/DepartmentSettings";
 
 function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember }) {
   const location = useLocation();
+  const [showChargeSubmenu, setShowChargeSubmenu] = useState(false);
   const [departments, setDepartments] = useState([
     { id: 1, companyName: "도원컴퍼니", departmentName: "영업부", teamName: "영업1팀" },
     { id: 2, companyName: "도원컴퍼니", departmentName: "개발부", teamName: "프론트엔드팀" },
@@ -35,13 +36,25 @@ function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember 
               <Link to="/">홈</Link>
             </li>
             <li className={location.pathname.startsWith("/members") ? "active" : ""}>
-              <Link to="/members">구성원</Link>
+              <Link to="/members">구성원관리</Link>
             </li>
-            <li className={location.pathname.startsWith("/settlement") ? "active" : ""}>
-              <Link to="/settlement">정산</Link>
-            </li>
-            <li className={location.pathname.startsWith("/charge") ? "active" : ""}>
-              <Link to="/charge">포인트 충전</Link>
+            <li className={location.pathname.startsWith("/charge") || location.pathname.startsWith("/settlement") ? "active dropdown" : "dropdown"}>
+              <span 
+                className="dropdown-toggle"
+                onClick={() => setShowChargeSubmenu(!showChargeSubmenu)}
+              >
+                충전하기 ▼
+              </span>
+              {showChargeSubmenu && (
+                <ul className="dropdown-menu">
+                  <li>
+                    <Link to="/charge" onClick={() => setShowChargeSubmenu(false)}>충전하기</Link>
+                  </li>
+                  <li>
+                    <Link to="/settlement" onClick={() => setShowChargeSubmenu(false)}>내역관리</Link>
+                  </li>
+                </ul>
+              )}
             </li>
             <li className={location.pathname.startsWith("/usage") ? "active" : ""}>
               <Link to="/usage">이용현황</Link>
