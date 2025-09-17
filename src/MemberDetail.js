@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { usageData } from './utils/mockData';
 
 function MemberDetail({ members, setMembers }) {
   const { id } = useParams();
@@ -15,6 +16,12 @@ function MemberDetail({ members, setMembers }) {
       setEditData(foundMember);
     }
   }, [id, members]);
+
+  // 구성원의 사용 포인트 계산
+  const memberUsage = member ? usageData.filter(usage => usage.memberName === member.name) : [];
+  const totalUsedPoints = memberUsage.reduce((sum, usage) => sum + usage.points, 0);
+  const totalUsedAmount = memberUsage.reduce((sum, usage) => sum + usage.amount, 0);
+  const usageCount = memberUsage.length;
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
@@ -162,22 +169,6 @@ function MemberDetail({ members, setMembers }) {
           
           <div className="form-row">
             <div className="form-group">
-              <label>현재 포인트</label>
-              {isEditing ? (
-                <input
-                  type="number"
-                  className="form-control"
-                  value={editData.point}
-                  onChange={(e) => handleInputChange('point', parseInt(e.target.value))}
-                />
-              ) : (
-                <div className="form-control-static point-value">
-                  {member.point.toLocaleString()}P
-                </div>
-              )}
-            </div>
-            
-            <div className="form-group">
               <label>연락처</label>
               {isEditing ? (
                 <input
@@ -190,6 +181,22 @@ function MemberDetail({ members, setMembers }) {
               ) : (
                 <div className="form-control-static">
                   {member.phone || '정보 없음'}
+                </div>
+              )}
+            </div>
+            
+            <div className="form-group">
+              <label>현재 포인트</label>
+              {isEditing ? (
+                <input
+                  type="number"
+                  className="form-control"
+                  value={editData.point}
+                  onChange={(e) => handleInputChange('point', parseInt(e.target.value))}
+                />
+              ) : (
+                <div className="form-control-static point-value">
+                  {member.point.toLocaleString()}P
                 </div>
               )}
             </div>
@@ -213,6 +220,73 @@ function MemberDetail({ members, setMembers }) {
           </div>
         </div>
       </div>
+
+      {/* 포인트 사용 통계 */}
+      <div className="card">
+        <div className="card-header">
+          <h3>포인트 사용 통계</h3>
+        </div>
+        <div className="card-content">
+          <div className="stats-grid">
+            <div className="card stat-card">
+              <div className="stat-label">현재 보유 포인트</div>
+              <div className="stat-value" style={{ color: 'var(--primary)' }}>
+                {member.point.toLocaleString()}P
+              </div>
+            </div>
+            <div className="card stat-card">
+              <div className="stat-label">총 사용 포인트</div>
+              <div className="stat-value" style={{ color: 'var(--danger)' }}>
+                {totalUsedPoints.toLocaleString()}P
+              </div>
+            </div>
+            <div className="card stat-card">
+              <div className="stat-label">총 사용 금액</div>
+              <div className="stat-value" style={{ color: 'var(--warning)' }}>
+                {totalUsedAmount.toLocaleString()}원
+              </div>
+            </div>
+            <div className="card stat-card">
+              <div className="stat-label">이용 건수</div>
+              <div className="stat-value" style={{ color: 'var(--info)' }}>
+                {usageCount}건
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 최근 이용 내역 */}
+      {memberUsage.length > 0 && (
+        <div className="card">
+          <div className="card-header">
+            <h3>최근 이용 내역</h3>
+            <p className="text-muted">최근 {Math.min(memberUsage.length, 10)}건의 이용 내역입니다</p>
+          </div>
+          <div className="card-content">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>이용일</th>
+                  <th>시설명</th>
+                  <th>사용 포인트</th>
+                  <th>사용 금액</th>
+                </tr>
+              </thead>
+              <tbody>
+                {memberUsage.slice(0, 10).map((usage, index) => (
+                  <tr key={index}>
+                    <td>{usage.usageDate}</td>
+                    <td>{usage.facility}</td>
+                    <td>{usage.points.toLocaleString()}P</td>
+                    <td>{usage.amount.toLocaleString()}원</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

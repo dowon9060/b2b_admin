@@ -852,6 +852,13 @@ body {
   color: var(--success) !important;
 }
 
+/* 텍스트 유틸리티 */
+.text-muted {
+  color: var(--gray-600);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
 /* 정적 폼 컨트롤 */
 .form-control-static {
   padding: var(--spacing-3) var(--spacing-4);
