@@ -1,0 +1,1450 @@
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation, useParams, useNavigate } from "react-router-dom";
+import "./App.css";
+import MemberList from "./MemberList";
+import MemberDetail from "./MemberDetail";
+
+const initialMembers = [
+  { id: 1, name: "홍길동", department: "영업", joinDate: "2022-01-01", empNo: "1001", point: 1000, phone: "010-1234-5678", email: "hong@company.com", userId: "hong@company.com" },
+  { id: 2, name: "김철수", department: "개발", joinDate: "2021-05-10", empNo: "1002", point: 800, phone: "010-2345-6789", email: "kim@company.com", userId: "kim@company.com" },
+  { id: 3, name: "이영희", department: "디자인", joinDate: "2023-03-15", empNo: "1003", point: 1200, phone: "010-3456-7890", email: "lee@company.com", userId: "lee@company.com" },
+];
+
+function LoginPage({ onLogin }) {
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // 실제 인증 로직은 추후 구현
+    if (userId && password) {
+      onLogin();
+      navigate("/");
+    } else {
+      alert("아이디와 패스워드를 입력하세요");
+    }
+  };
+  return (
+    <div className="login-container">
+      <h2>로그인</h2>
+      <form className="login-form" onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="userId">아이디</label>
+          <input id="userId" type="text" placeholder="아이디 입력" value={userId} onChange={e => setUserId(e.target.value)} />
+        </div>
+        <div>
+          <label htmlFor="password">패스워드</label>
+          <input id="password" type="password" placeholder="패스워드 입력" value={password} onChange={e => setPassword(e.target.value)} />
+        </div>
+        <div>
+          <label>
+            <input type="checkbox" /> 아이디 저장(기억)
+          </label>
+        </div>
+        <button type="submit">로그인</button>
+      </form>
+    </div>
+  );
+}
+
+function Dashboard() {
+  const navigate = useNavigate();
+
+  const handleCardClick = (type) => {
+    if (type === 'members') {
+      navigate('/members');
+    } else if (type === 'settlement') {
+      navigate('/settlement');
+    } else if (type === 'charge') {
+      navigate('/charge');
+    }
+  };
+
+  // 현재 날짜 기준 계산
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth(); // 0-11
+  
+  // 구성원 데이터 (실제로는 members prop에서 가져옴)
+  const totalMembers = 15; // 등록된 구성원 수
+  
+  // 기본 포인트 데이터 (실제로는 API에서 가져옴)
+  const rawPointData = {
+    remainingPoints: 5000000, // 현재 남아있는 전체 포인트
+    totalUsedPoints: 1800000, // 누적 사용한 포인트
+    chargeDate: "2024-01-15", // 포인트 결제일
+    monthlyUsageData: [
+      { year: 2024, month: 9, usage: 380000, count: 45 }, // 10월 (month는 0-based)
+      { year: 2024, month: 10, usage: 420000, count: 52 }, // 11월
+      { year: 2024, month: 11, usage: 450000, count: 48 }, // 12월
+    ]
+  };
+
+  // 소멸예상일 계산 및 소멸 포인트 확인
+  const getExpirationDate = (chargeDate) => {
+    const date = new Date(chargeDate);
+    date.setMonth(date.getMonth() + 6);
+    return date;
+  };
+
+  const expirationDate = getExpirationDate(rawPointData.chargeDate);
+  const isExpired = today > expirationDate;
+  const expiringPoints = isExpired ? 0 : 150000; // 소멸예상일 지나면 0
+
+  // 이번달 사용한 포인트 (현재 월 기준)
+  const thisMonthUsage = rawPointData.monthlyUsageData.find(
+    data => data.year === currentYear && data.month === currentMonth
+  );
+  const monthlyUsedPoints = thisMonthUsage ? thisMonthUsage.usage : 0;
+
+  // 최근 3개월 평균 사용 포인트
+  const recentThreeMonths = rawPointData.monthlyUsageData.slice(-3);
+  const averageUsage = Math.round(
+    recentThreeMonths.reduce((sum, data) => sum + data.usage, 0) / recentThreeMonths.length
+  );
+
+  // 포인트 계산
+  const pointData = {
+    totalPoints: rawPointData.remainingPoints, // 현재 남아있는 전체 포인트
+    availablePoints: rawPointData.remainingPoints - expiringPoints, // 전체포인트 - 소멸예정포인트
+    usedPoints: rawPointData.totalUsedPoints, // 누적 사용한 포인트
+    monthlyUsedPoints, // 이번달 사용한 포인트
+    totalMembers, // 구성원 현황
+    averageUsage, // 최근 3개월 평균 사용 포인트
+    expiringPoints, // 소멸예상 포인트
+    expirationDate: expirationDate.toLocaleDateString('ko-KR') // 소멸예상일
+  };
+
+  // 최근 3개월 사용 현황 데이터 (동적 생성)
+  const getMonthName = (monthIndex) => {
+    const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+    return months[monthIndex];
+  };
+
+  const chartData = recentThreeMonths.map(data => ({
+    month: getMonthName(data.month),
+    usage: data.usage,
+    count: data.count
+  }));
+
+  const maxUsage = Math.max(...chartData.map(d => d.usage));
+
+  // 이용종목 현황 (최근 3개월 기준으로 동적 계산)
+  const categoryData = [
+    { name: '강남헬스장', icon: '🏋️‍♀️', usage: 426000, percentage: 35 },
+    { name: '서초필라테스', icon: '🧘‍♀️', usage: 316800, percentage: 26 },
+    { name: '역삼요가', icon: '🧘‍♂️', usage: 231600, percentage: 19 },
+    { name: '논현크로스핏', icon: '🏃‍♀️', usage: 158400, percentage: 13 },
+    { name: '신사PT', icon: '💪', usage: 85200, percentage: 7 },
+    { name: '기타시설', icon: '🎯', usage: 36600, percentage: 3 }
+  ];
+
+  // 최근 3개월 총 사용량 기준으로 백분율 재계산
+  const totalRecentUsage = recentThreeMonths.reduce((sum, data) => sum + data.usage, 0);
+  const updatedCategoryData = categoryData.map(category => ({
+    ...category,
+    // 실제로는 API에서 최근 3개월 종목별 데이터를 가져와서 계산
+    percentage: Math.round((category.usage / totalRecentUsage) * 100)
+  }));
+
+  return (
+    <div className="dashboard">
+      <div className="dashboard-header">
+        <h2>대시보드</h2>
+        <div className="company-name">도원컴퍼니</div>
+      </div>
+      
+      {/* 첫 번째 줄: 전체 포인트, 이용가능 포인트, 사용한 포인트 */}
+      <div className="dashboard-section">
+        <div className="dashboard-cards dashboard-row">
+          <div className="dashboard-card clickable" onClick={() => handleCardClick('charge')}>
+            <div className="card-label">전체 포인트</div>
+            <div className="card-value">{pointData.totalPoints.toLocaleString()}P</div>
+          </div>
+          <div className="dashboard-card">
+            <div className="card-label">이용가능 포인트</div>
+            <div className="card-value available">{pointData.availablePoints.toLocaleString()}P</div>
+          </div>
+          <div className="dashboard-card clickable" onClick={() => handleCardClick('settlement')}>
+            <div className="card-label">사용한 포인트</div>
+            <div className="card-value used">{pointData.usedPoints.toLocaleString()}P</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 두 번째 줄: 이번달 사용한 포인트, 소멸예상 포인트 */}
+      <div className="dashboard-section">
+        <div className="dashboard-cards dashboard-row">
+          <div className="dashboard-card">
+            <div className="card-label">이번달 사용한 포인트</div>
+            <div className="card-value monthly">{pointData.monthlyUsedPoints.toLocaleString()}P</div>
+          </div>
+          <div className="dashboard-card expiring">
+            <div className="card-label">소멸예상 포인트</div>
+            <div className="card-value expiring">{pointData.expiringPoints.toLocaleString()}P</div>
+            <div className="card-sub">소멸예상일: {pointData.expirationDate}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 사용 현황 그래프 */}
+      <div className="dashboard-section">
+        <div className="usage-chart-container">
+          <h3>사용 현황 (최근 3개월)</h3>
+          <div className="usage-chart">
+            {/* 구분선 격자 */}
+            <svg className="chart-grid" viewBox="0 0 300 100" preserveAspectRatio="none">
+              {/* 수평 구분선 (가로선) */}
+              <line x1="0" y1="15" x2="300" y2="15" className="grid-line" />
+              <line x1="0" y1="30" x2="300" y2="30" className="grid-line" />
+              <line x1="0" y1="45" x2="300" y2="45" className="grid-line" />
+              <line x1="0" y1="60" x2="300" y2="60" className="grid-line" />
+              <line x1="0" y1="75" x2="300" y2="75" className="grid-line" />
+              <line x1="0" y1="90" x2="300" y2="90" className="grid-line" />
+              <line x1="0" y1="100" x2="300" y2="100" className="grid-line-bottom" />
+              
+              {/* 왼쪽 끝 세로선 */}
+              <line x1="0" y1="0" x2="0" y2="100" className="grid-line-left" />
+            </svg>
+            
+            {/* 바 차트 */}
+            {chartData.map((data, index) => (
+              <div key={index} className="chart-bar-container">
+                <div className="chart-bar">
+                  <div
+                    className="chart-bar-fill"
+                    style={{ height: `${(data.usage / maxUsage) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* 라벨 영역 - 베이스라인 아래 별도 영역 */}
+          <div className="usage-chart-labels">
+            {chartData.map((data, index) => (
+              <div key={index} className="chart-label-group">
+                <div className="chart-label">{data.month}</div>
+                <div className="chart-value">{data.usage.toLocaleString()}P</div>
+                <div className="chart-count">({data.count}건)</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 세 번째 줄: 구성원 현황, 평균 사용 포인트 */}
+      <div className="dashboard-section">
+        <div className="dashboard-cards dashboard-row">
+          <div className="dashboard-card clickable" onClick={() => handleCardClick('members')}>
+            <div className="card-label">구성원 현황</div>
+            <div className="card-value members">{pointData.totalMembers}명</div>
+          </div>
+          <div className="dashboard-card">
+            <div className="card-label">평균 사용 포인트</div>
+            <div className="card-value average">{pointData.averageUsage.toLocaleString()}P</div>
+            <div className="card-sub">인당 월 평균</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 이용종목 현황 (최근 3개월) */}
+      <div className="dashboard-section">
+        <div className="usage-categories-container">
+          <h3>이용종목 현황 (최근 3개월)</h3>
+          <div className="categories-grid">
+            {updatedCategoryData.map((category, index) => (
+              <div key={index} className="category-item">
+                <div className="category-icon">{category.icon}</div>
+                <div className="category-name">{category.name}</div>
+                <div className="category-usage">{category.usage.toLocaleString()}P</div>
+                <div className="category-percentage">{category.percentage}%</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Settlement() {
+  const navigate = useNavigate();
+  const [settlements, setSettlements] = useState([
+    { id: 1, quarter: "2분기", period: "2024-04-01 ~ 2024-06-30", amount: 1000000, status: "완료", startDate: "2024-04-01" },
+    { id: 2, quarter: "1분기", period: "2024-01-01 ~ 2024-03-31", amount: 850000, status: "결제전", startDate: "2024-01-01" },
+    { id: 3, quarter: "3분기", period: "2024-07-01 ~ 2024-09-30", amount: 1200000, status: "완료", startDate: "2024-07-01" },
+    { id: 4, quarter: "4분기", period: "2024-10-01 ~ 2024-12-31", amount: 950000, status: "결제전", startDate: "2024-10-01" },
+  ].sort((a, b) => new Date(b.startDate) - new Date(a.startDate))); // 최신순 정렬
+
+  const handleRowClick = (id) => {
+    navigate(`/settlement/${id}`);
+  };
+
+  return (
+    <div className="settlement-page">
+      <h2>정산</h2>
+      <div className="settlement-filter">
+        <label>분기별:
+          <select>
+            <option>전체</option>
+            <option>1분기</option>
+            <option>2분기</option>
+            <option>3분기</option>
+            <option>4분기</option>
+          </select>
+        </label>
+        <label>결제상태:
+          <select>
+            <option>전체</option>
+            <option>완료</option>
+            <option>결제전</option>
+          </select>
+        </label>
+        <label>시작일:
+          <input type="date" />
+        </label>
+        <label>종료일:
+          <input type="date" />
+        </label>
+        <button>조회</button>
+      </div>
+      <table className="settlement-table">
+        <thead>
+          <tr>
+            <th>정산ID</th>
+            <th>분기</th>
+            <th>기간</th>
+            <th>결제 예정금액</th>
+            <th>결제상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          {settlements.map(settlement => (
+            <tr key={settlement.id} onClick={() => handleRowClick(settlement.id)} style={{cursor:'pointer'}}>
+              <td>{settlement.id}</td>
+              <td>{settlement.quarter}</td>
+              <td>{settlement.period}</td>
+              <td>{settlement.amount.toLocaleString()}원</td>
+              <td>
+                <span className={`status ${settlement.status === '완료' ? 'status-completed' : 'status-pending'}`}>
+                  {settlement.status}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function SettlementDetail() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  
+  // 정산 데이터 (실제로는 API에서 가져옴)
+  const settlementData = {
+    1: {
+      id: 1,
+      quarter: "2분기",
+      period: "2024-04-01 ~ 2024-06-30",
+      totalAmount: 1000000,
+      status: "완료",
+      usageData: [
+        { id: 1, memberName: "홍길동", department: "영업", facility: "강남헬스장", usageDate: "2024-04-15", points: 5000, amount: 50000 },
+        { id: 2, memberName: "김철수", department: "개발", facility: "서초필라테스", usageDate: "2024-04-20", points: 3000, amount: 30000 },
+        { id: 3, memberName: "이영희", department: "디자인", facility: "역삼요가", usageDate: "2024-05-10", points: 2000, amount: 20000 },
+        { id: 4, memberName: "홍길동", department: "영업", facility: "논현크로스핏", usageDate: "2024-05-25", points: 4000, amount: 40000 },
+        { id: 5, memberName: "김철수", department: "개발", facility: "강남헬스장", usageDate: "2024-06-05", points: 6000, amount: 60000 }
+      ]
+    },
+    2: {
+      id: 2,
+      quarter: "1분기",
+      period: "2024-01-01 ~ 2024-03-31",
+      totalAmount: 850000,
+      status: "결제전",
+      usageData: [
+        { id: 6, memberName: "박민수", department: "마케팅", facility: "논현크로스핏", usageDate: "2024-01-10", points: 7000, amount: 70000 },
+        { id: 7, memberName: "정수진", department: "인사", facility: "서초필라테스", usageDate: "2024-02-14", points: 2500, amount: 25000 }
+      ]
+    }
+  };
+
+  const settlement = settlementData[id];
+  
+  if (!settlement) {
+    return (
+      <div className="settlement-detail-page">
+        <h2>정산 정보를 찾을 수 없습니다.</h2>
+        <button onClick={() => navigate("/settlement")} className="back-btn">
+          돌아가기
+        </button>
+      </div>
+    );
+  }
+
+  // 구성원별 통계 계산
+  const memberStats = settlement.usageData.reduce((acc, usage) => {
+    if (!acc[usage.memberName]) {
+      acc[usage.memberName] = {
+        memberName: usage.memberName,
+        department: usage.department,
+        totalPoints: 0,
+        totalAmount: 0,
+        usageCount: 0
+      };
+    }
+    acc[usage.memberName].totalPoints += usage.points;
+    acc[usage.memberName].totalAmount += usage.amount;
+    acc[usage.memberName].usageCount += 1;
+    return acc;
+  }, {});
+
+  const memberStatsList = Object.values(memberStats);
+
+  return (
+    <div className="settlement-detail-page">
+      <div className="settlement-detail-header">
+        <div className="header-left">
+          <button onClick={() => navigate("/settlement")} className="back-btn">
+            ← 돌아가기
+          </button>
+        </div>
+        <div className="header-center">
+          <h2>정산 상세 - {settlement.quarter}</h2>
+          <p className="period">{settlement.period}</p>
+        </div>
+        <div className="header-right">
+          <span className={`status ${settlement.status === '완료' ? 'status-completed' : 'status-pending'}`}>
+            {settlement.status}
+          </span>
+        </div>
+      </div>
+
+      <div className="settlement-summary">
+        <div className="summary-cards">
+          <div className="summary-card">
+            <h3>총 결제 금액</h3>
+            <p className="amount">{settlement.totalAmount.toLocaleString()}원</p>
+          </div>
+          <div className="summary-card">
+            <h3>이용 구성원</h3>
+            <p className="count">{memberStatsList.length}명</p>
+          </div>
+          <div className="summary-card">
+            <h3>총 이용 건수</h3>
+            <p className="count">{settlement.usageData.length}건</p>
+          </div>
+          <div className="summary-card">
+            <h3>총 사용 포인트</h3>
+            <p className="points">{settlement.usageData.reduce((sum, usage) => sum + usage.points, 0).toLocaleString()}P</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="detail-tabs">
+        <div className="tab-content">
+          <h3>구성원별 이용 현황</h3>
+          <table className="member-stats-table">
+            <thead>
+              <tr>
+                <th>구성원명</th>
+                <th>부서</th>
+                <th>이용 건수</th>
+                <th>사용 포인트</th>
+                <th>사용 금액</th>
+              </tr>
+            </thead>
+            <tbody>
+              {memberStatsList.map((member, index) => (
+                <tr key={index}>
+                  <td>{member.memberName}</td>
+                  <td>{member.department}</td>
+                  <td>{member.usageCount}건</td>
+                  <td>{member.totalPoints.toLocaleString()}P</td>
+                  <td>{member.totalAmount.toLocaleString()}원</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="tab-content">
+          <h3>상세 이용 내역</h3>
+          <table className="usage-detail-table">
+            <thead>
+              <tr>
+                <th>이용일</th>
+                <th>구성원명</th>
+                <th>부서</th>
+                <th>이용 시설</th>
+                <th>사용 포인트</th>
+                <th>사용 금액</th>
+              </tr>
+            </thead>
+            <tbody>
+              {settlement.usageData.map((usage) => (
+                <tr key={usage.id}>
+                  <td>{usage.usageDate}</td>
+                  <td>{usage.memberName}</td>
+                  <td>{usage.department}</td>
+                  <td>{usage.facility}</td>
+                  <td>{usage.points.toLocaleString()}P</td>
+                  <td>{usage.amount.toLocaleString()}원</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function UsageTable() {
+  const [search, setSearch] = useState(""); // 이름/부서 검색
+  const [deptFilter, setDeptFilter] = useState("전체"); // 부서 필터
+  const [quarterFilter, setQuarterFilter] = useState("전체"); // 분기 필터
+  const [startDate, setStartDate] = useState(""); // 시작일
+  const [endDate, setEndDate] = useState(""); // 종료일
+  const [viewMode, setViewMode] = useState("list"); // "list" 또는 "department"
+  const [collapsedDepts, setCollapsedDepts] = useState({}); // 접힌 부서들
+  const [usageData, setUsageData] = useState([
+    { id: 1, memberName: "홍길동", department: "영업", facility: "강남헬스장", usageDate: "2024-10-15", points: 5000, amount: 50000 },
+    { id: 2, memberName: "김철수", department: "개발", facility: "서초필라테스", usageDate: "2024-10-20", points: 3000, amount: 30000 },
+    { id: 3, memberName: "이영희", department: "디자인", facility: "역삼요가", usageDate: "2024-09-25", points: 2000, amount: 20000 },
+    { id: 4, memberName: "박민수", department: "마케팅", facility: "논현크로스핏", usageDate: "2024-09-30", points: 4000, amount: 40000 },
+    { id: 5, memberName: "홍길동", department: "영업", facility: "강남헬스장", usageDate: "2024-08-10", points: 6000, amount: 60000 },
+    { id: 6, memberName: "김철수", department: "개발", facility: "서초필라테스", usageDate: "2024-07-15", points: 3500, amount: 35000 },
+    { id: 7, memberName: "정수진", department: "인사", facility: "역삼요가", usageDate: "2024-10-05", points: 2500, amount: 25000 },
+    { id: 8, memberName: "이영희", department: "디자인", facility: "논현크로스핏", usageDate: "2024-09-12", points: 4500, amount: 45000 }
+  ]);
+
+  const departments = ["전체", "영업", "개발", "디자인", "마케팅", "인사"];
+  const quarters = ["전체", "1분기", "2분기", "3분기", "4분기"];
+
+  // 분기 계산 함수
+  const getQuarter = (date) => {
+    const month = new Date(date).getMonth() + 1;
+    if (month <= 3) return "1분기";
+    if (month <= 6) return "2분기";
+    if (month <= 9) return "3분기";
+    return "4분기";
+  };
+
+  // 데이터 필터링
+  const filteredData = usageData.filter(usage => {
+    // 이름/부서 검색
+    const searchMatch = search === "" || 
+      usage.memberName.includes(search) || 
+      usage.department.includes(search);
+    
+    // 부서 필터
+    const deptMatch = deptFilter === "전체" || usage.department === deptFilter;
+    
+    // 분기 필터
+    const quarterMatch = quarterFilter === "전체" || getQuarter(usage.usageDate) === quarterFilter;
+    
+    // 기간 필터
+    let dateMatch = true;
+    if (startDate && endDate) {
+      const usageDate = new Date(usage.usageDate);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      dateMatch = usageDate >= start && usageDate <= end;
+    }
+    
+    return searchMatch && deptMatch && quarterMatch && dateMatch;
+  });
+
+  // 필터 초기화
+  const handleReset = () => {
+    setSearch("");
+    setDeptFilter("전체");
+    setQuarterFilter("전체");
+    setStartDate("");
+    setEndDate("");
+  };
+
+  // 부서별 그룹화
+  const groupedByDepartment = filteredData.reduce((groups, usage) => {
+    const department = usage.department;
+    if (!groups[department]) {
+      groups[department] = [];
+    }
+    groups[department].push(usage);
+    return groups;
+  }, {});
+
+  // 부서 접기/펼치기
+  const toggleDepartment = (department) => {
+    setCollapsedDepts(prev => ({
+      ...prev,
+      [department]: !prev[department]
+    }));
+  };
+
+  return (
+    <div className="usage-table-page">
+      <div className="usage-header">
+        <h2>이용현황</h2>
+        <div className="view-mode-buttons">
+          <button
+            className={`view-mode-btn ${viewMode === "list" ? "active" : ""}`}
+            onClick={() => setViewMode("list")}
+          >
+            📋 이름으로 보기
+          </button>
+          <button
+            className={`view-mode-btn ${viewMode === "department" ? "active" : ""}`}
+            onClick={() => setViewMode("department")}
+          >
+            🏢 부서별 보기
+          </button>
+        </div>
+      </div>
+      
+      {/* 검색 및 필터 섹션 */}
+      <div className="usage-filters">
+        {/* 첫 번째 줄: 검색 */}
+        <div className="filter-row">
+          <div className="search-group">
+            <label>검색 (이름/부서):</label>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="구성원명 또는 부서명 입력"
+              className="search-input"
+            />
+          </div>
+        </div>
+        
+        {/* 두 번째 줄: 부서, 분기 필터, 초기화 버튼 */}
+        <div className="filter-row">
+          <div className="filter-group">
+            <label>부서:</label>
+            <select value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)} className="filter-select">
+              {departments.map(dept => (
+                <option key={dept} value={dept}>{dept}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="filter-group">
+            <label>분기:</label>
+            <select value={quarterFilter} onChange={(e) => setQuarterFilter(e.target.value)} className="filter-select">
+              {quarters.map(quarter => (
+                <option key={quarter} value={quarter}>{quarter}</option>
+              ))}
+            </select>
+          </div>
+          
+          <button onClick={handleReset} className="reset-btn">
+            필터 초기화
+          </button>
+        </div>
+        
+        {/* 세 번째 줄: 기간 지정 */}
+        <div className="filter-row">
+          <div className="date-group">
+            <label>기간 지정:</label>
+            <div className="date-inputs">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="date-input"
+              />
+              <span className="date-separator">~</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="date-input"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 결과 요약 */}
+      <div className="usage-summary">
+        <span>총 {filteredData.length}건의 이용 내역</span>
+        <span>총 사용 포인트: {filteredData.reduce((sum, usage) => sum + usage.points, 0).toLocaleString()}P</span>
+        <span>총 사용 금액: {filteredData.reduce((sum, usage) => sum + usage.amount, 0).toLocaleString()}원</span>
+      </div>
+      
+      {/* 이름으로 보기 - 기존 테이블 */}
+      {viewMode === "list" && (
+        <table className="usage-table">
+          <thead>
+            <tr>
+              <th>이용일</th>
+              <th>구성원명</th>
+              <th>부서</th>
+              <th>시설명</th>
+              <th>사용 포인트</th>
+              <th>사용금액</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData.length > 0 ? (
+              filteredData.map(usage => (
+                <tr key={usage.id}>
+                  <td>{usage.usageDate}</td>
+                  <td>{usage.memberName}</td>
+                  <td>{usage.department}</td>
+                  <td>{usage.facility}</td>
+                  <td>{usage.points.toLocaleString()}P</td>
+                  <td>{usage.amount.toLocaleString()}원</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="no-data">검색 조건에 맞는 이용 내역이 없습니다.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      )}
+
+      {/* 부서별 보기 */}
+      {viewMode === "department" && (
+        <div className="department-view">
+          {Object.entries(groupedByDepartment).map(([department, usages]) => {
+            const isCollapsed = collapsedDepts[department];
+            const deptTotalPoints = usages.reduce((sum, usage) => sum + usage.points, 0);
+            const deptTotalAmount = usages.reduce((sum, usage) => sum + usage.amount, 0);
+            
+            return (
+              <div key={department} className="department-section">
+                <div 
+                  className="department-header-compact" 
+                  onClick={() => toggleDepartment(department)}
+                >
+                  <div className="department-toggle">
+                    <span className={`toggle-icon ${isCollapsed ? 'collapsed' : ''}`}>▼</span>
+                    <span className="department-title">{department}</span>
+                    <span className="department-count">({usages.length}건)</span>
+                  </div>
+                  <div className="department-total-points">
+                    {deptTotalPoints.toLocaleString()}P ({deptTotalAmount.toLocaleString()}원)
+                  </div>
+                </div>
+                
+                {!isCollapsed && (
+                  <div className="department-usage-list">
+                    {usages.map(usage => (
+                      <div key={usage.id} className="usage-row-card">
+                        <div className="usage-date">{usage.usageDate}</div>
+                        <div className="usage-info">
+                          <div className="usage-member-primary">{usage.memberName}</div>
+                          <div className="usage-details-row">
+                            <span className="usage-facility-info">시설: {usage.facility}</span>
+                            <span className="usage-point-info">포인트: {usage.points.toLocaleString()}P</span>
+                            <span className="usage-amount-info">금액: {usage.amount.toLocaleString()}원</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GiftPage({ members, setMembers }) {
+  const [availablePoints, setAvailablePoints] = useState(500000); // 선물 가능한 포인트
+  const [search, setSearch] = useState("");
+  const [dept, setDept] = useState("전체");
+  const [selectedGifts, setSelectedGifts] = useState({}); // 각 구성원별 선물할 포인트
+
+  const departments = ["전체", "영업", "개발", "디자인"];
+
+  // 필터링
+  const filtered = members.filter(
+    m =>
+      (dept === "전체" || m.department === dept) &&
+      m.name.includes(search)
+  );
+
+  // 선물 포인트 변경
+  const handleGiftChange = (memberId, points) => {
+    setSelectedGifts({
+      ...selectedGifts,
+      [memberId]: Number(points) || 0
+    });
+  };
+
+  // 선물하기 실행
+  const handleSendGift = (memberId) => {
+    const giftPoints = selectedGifts[memberId] || 0;
+    if (giftPoints <= 0) {
+      alert("선물할 포인트를 입력해주세요.");
+      return;
+    }
+    if (giftPoints > availablePoints) {
+      alert("선물 가능한 포인트가 부족합니다.");
+      return;
+    }
+
+    // 구성원에게 포인트 선물
+    setMembers(members =>
+      members.map(m =>
+        m.id === memberId ? { ...m, point: m.point + giftPoints } : m
+      )
+    );
+
+    // 선물 가능한 포인트 차감
+    setAvailablePoints(prev => prev - giftPoints);
+
+    // 선물 내역 초기화
+    setSelectedGifts({
+      ...selectedGifts,
+      [memberId]: 0
+    });
+
+    const member = members.find(m => m.id === memberId);
+    alert(`${member.name}님에게 ${giftPoints.toLocaleString()}포인트를 선물했습니다! 🎁`);
+  };
+
+  // 총 선물 예정 포인트 계산
+  const totalGiftPoints = Object.values(selectedGifts).reduce((sum, points) => sum + (points || 0), 0);
+
+  return (
+    <div className="gift-page">
+      <h2>선물하기 🎁</h2>
+      
+      <div className="gift-points-compact">
+        <div className="points-row">
+          <span className="label">선물 가능한 포인트:</span>
+          <span className="value">{availablePoints.toLocaleString()}P</span>
+        </div>
+        {totalGiftPoints > 0 && (
+          <>
+            <div className="points-row preview">
+              <span className="label">선물 예정:</span>
+              <span className="value preview-highlight">{totalGiftPoints.toLocaleString()}P</span>
+            </div>
+            <div className="points-row after">
+              <span className="label">선물 후 잔여:</span>
+              <span className="value after-highlight">{(availablePoints - totalGiftPoints).toLocaleString()}P</span>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="member-search-section">
+        <h3>구성원 검색</h3>
+        <div className="search-filters">
+          <input
+            type="text"
+            placeholder="구성원 이름 검색"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="search-input"
+          />
+          <select value={dept} onChange={e => setDept(e.target.value)} className="dept-select">
+            {departments.map(d => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="gift-member-list">
+        <h3>구성원 목록</h3>
+        <table className="gift-table">
+          <thead>
+            <tr>
+              <th>이름</th>
+              <th>부서</th>
+              <th>사원번호</th>
+              <th>현재 포인트</th>
+              <th>입사일</th>
+              <th>선물할 포인트</th>
+              <th>선물하기</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(m => (
+              <tr key={m.id}>
+                <td>{m.name}</td>
+                <td>{m.department}</td>
+                <td>{m.empNo}</td>
+                <td>{m.point.toLocaleString()}P</td>
+                <td>{m.joinDate}</td>
+                <td>
+                  <input
+                    type="number"
+                    value={selectedGifts[m.id] || ""}
+                    onChange={(e) => handleGiftChange(m.id, e.target.value)}
+                    placeholder="포인트"
+                    min="0"
+                    max={availablePoints}
+                    className="gift-input"
+                  />
+                </td>
+                <td>
+                  <button
+                    className="gift-btn"
+                    onClick={() => handleSendGift(m.id)}
+                    disabled={!selectedGifts[m.id] || selectedGifts[m.id] <= 0}
+                  >
+                    🎁 선물
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function PointCharge() {
+  const [totalAmount, setTotalAmount] = useState(0); // 총 충전 금액 (누적)
+  const [customAmount, setCustomAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [currentPoints, setCurrentPoints] = useState(125000); // 현재 이용가능한 포인트
+  const [showPaymentModal, setShowPaymentModal] = useState(false); // 결제 방법 팝업 상태
+  const [chargeHistory, setChargeHistory] = useState([
+    { id: 1, date: "2024-01-15", amount: 100000, method: "카드결제", status: "완료" },
+    { id: 2, date: "2024-01-10", amount: 50000, method: "계좌이체", status: "완료" },
+  ]);
+
+  const amounts = [10000, 30000, 50000, 100000, 200000, 500000];
+
+  const handleAmountSelect = (amount) => {
+    setTotalAmount(prev => prev + amount); // 기존 금액에 누적
+    setCustomAmount("");
+  };
+
+  const handleCustomAmountChange = (value) => {
+    setCustomAmount(value);
+    setTotalAmount(0); // 직접 입력 시 누적 금액 초기화
+  };
+
+  const handleAddCustomAmount = () => {
+    const amount = Number(customAmount);
+    if (amount > 0) {
+      setTotalAmount(prev => prev + amount);
+      setCustomAmount("");
+    }
+  };
+
+  const handleReset = () => {
+    setTotalAmount(0);
+    setCustomAmount("");
+  };
+
+  const handleChargeClick = () => {
+    const amount = totalAmount || Number(customAmount);
+    if (!amount || amount < 1000) {
+      alert("최소 1,000원 이상 충전해주세요.");
+      return;
+    }
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentConfirm = (selectedMethod) => {
+    const amount = totalAmount || Number(customAmount);
+    
+    // 결제 처리 로직 (실제로는 결제 API 연동)
+    const newCharge = {
+      id: chargeHistory.length + 1,
+      date: new Date().toISOString().split('T')[0],
+      amount: amount,
+      method: selectedMethod === "card" ? "카드결제" : "계좌이체",
+      status: "완료"
+    };
+    
+    setChargeHistory([newCharge, ...chargeHistory]);
+    setCurrentPoints(prev => prev + amount); // 충전 후 현재 포인트 업데이트
+    setTotalAmount(0);
+    setCustomAmount("");
+    setShowPaymentModal(false);
+    alert(`${amount.toLocaleString()}원이 충전되었습니다.`);
+  };
+
+  return (
+    <div className="charge-page">
+      <h2>포인트 충전</h2>
+      
+      <div className="current-points-compact">
+        <div className="points-row">
+          <span className="label">이용가능 포인트:</span>
+          <span className="value">{currentPoints.toLocaleString()}P</span>
+        </div>
+        {totalAmount > 0 && (
+          <div className="points-row charge-preview">
+            <span className="label">충전 후:</span>
+            <span className="value preview">{(currentPoints + totalAmount).toLocaleString()}P</span>
+          </div>
+        )}
+      </div>
+      
+      <div className="charge-section">
+        <h3>충전 금액 선택</h3>
+        <div className="charge-total-row">
+          <div className="total-info">
+            <span className="total-label">선택 금액:</span>
+            <span className="total-value">{totalAmount.toLocaleString()}원</span>
+          </div>
+          {totalAmount > 0 && (
+            <button className="reset-small-btn" onClick={handleReset}>
+              초기화
+            </button>
+          )}
+        </div>
+        
+        <div className="amount-buttons">
+          {amounts.map(amount => (
+            <button
+              key={amount}
+              className="amount-btn"
+              onClick={() => handleAmountSelect(amount)}
+            >
+              +{amount.toLocaleString()}원
+            </button>
+          ))}
+        </div>
+        
+        <div className="custom-amount">
+          <label>직접 입력:</label>
+          <input
+            type="number"
+            value={customAmount}
+            onChange={(e) => handleCustomAmountChange(e.target.value)}
+            placeholder="추가할 금액을 입력하세요"
+            min="1000"
+          />
+          <span>원</span>
+          {customAmount && (
+            <button className="add-custom-btn" onClick={handleAddCustomAmount}>
+              추가
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="payment-section">
+        <h3>결제 방법</h3>
+        <div className="payment-methods">
+          <label>
+            <input
+              type="radio"
+              value="card"
+              checked={paymentMethod === "card"}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            />
+            신용카드/체크카드
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="transfer"
+              checked={paymentMethod === "transfer"}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            />
+            계좌이체
+          </label>
+        </div>
+      </div>
+
+      <div className="charge-summary">
+        <h3>충전 정보</h3>
+        <div className="summary-item">
+          <span>충전 금액:</span>
+          <span className="amount">{(totalAmount || Number(customAmount) || 0).toLocaleString()}원</span>
+        </div>
+        <div className="summary-item">
+          <span>결제 방법:</span>
+          <span>{paymentMethod === "card" ? "신용카드/체크카드" : "계좌이체"}</span>
+        </div>
+      </div>
+
+      <button className="charge-btn" onClick={handleChargeClick}>
+        {(totalAmount || Number(customAmount) || 0).toLocaleString()}원 충전하기
+      </button>
+
+      <div className="charge-history">
+        <h3>충전 내역</h3>
+        <table className="history-table">
+          <thead>
+            <tr>
+              <th>날짜</th>
+              <th>충전 금액</th>
+              <th>결제 방법</th>
+              <th>상태</th>
+            </tr>
+          </thead>
+          <tbody>
+            {chargeHistory.map(item => (
+              <tr key={item.id}>
+                <td>{item.date}</td>
+                <td>{item.amount.toLocaleString()}원</td>
+                <td>{item.method}</td>
+                <td><span className="status-complete">{item.status}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 결제 방법 선택 팝업 */}
+      {showPaymentModal && (
+        <div className="modal-overlay" onClick={() => setShowPaymentModal(false)}>
+          <div className="payment-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="payment-modal-header">
+              <h3>결제 방법 선택</h3>
+              <button className="close-btn" onClick={() => setShowPaymentModal(false)}>
+                ✕
+              </button>
+            </div>
+            <div className="payment-modal-content">
+              <div className="charge-amount-display">
+                충전 금액: <span className="amount-highlight">{(totalAmount || Number(customAmount) || 0).toLocaleString()}원</span>
+              </div>
+              <div className="payment-options">
+                <button 
+                  className="payment-option-btn card"
+                  onClick={() => handlePaymentConfirm("card")}
+                >
+                  <div className="payment-icon">💳</div>
+                  <div className="payment-text">
+                    <div className="payment-title">신용카드/체크카드</div>
+                    <div className="payment-desc">카드 결제로 즉시 충전</div>
+                  </div>
+                </button>
+                <button 
+                  className="payment-option-btn transfer"
+                  onClick={() => handlePaymentConfirm("transfer")}
+                >
+                  <div className="payment-icon">🏦</div>
+                  <div className="payment-text">
+                    <div className="payment-title">계좌이체</div>
+                    <div className="payment-desc">계좌 이체로 안전 결제</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember }) {
+  const location = useLocation();
+  const [departments, setDepartments] = useState([
+    { id: 1, companyName: "테크노블", departmentName: "개발부", teamName: "프론트엔드팀" },
+    { id: 2, companyName: "테크노블", departmentName: "개발부", teamName: "백엔드팀" },
+    { id: 3, companyName: "테크노블", departmentName: "영업부", teamName: "기업영업팀" },
+    { id: 4, companyName: "테크노블", departmentName: "마케팅부", teamName: "디지털마케팅팀" },
+    { id: 5, companyName: "테크노블", departmentName: "인사부", teamName: "채용팀" }
+  ]);
+
+  const handleAddDepartment = (newDept) => {
+    const newId = Math.max(...departments.map(d => d.id)) + 1;
+    setDepartments(prev => [...prev, { ...newDept, id: newId }]);
+  };
+
+  return (
+    <div className="admin-layout">
+      <aside className="sidebar">
+        <ul>
+          <li className={location.pathname === "/" ? "active" : ""}><Link to="/">홈</Link></li>
+          <li className={location.pathname.startsWith("/members") ? "active" : ""}><Link to="/members">구성원</Link></li>
+          <li className={location.pathname.startsWith("/settlement") ? "active" : ""}><Link to="/settlement">정산</Link></li>
+          <li className={location.pathname.startsWith("/charge") ? "active" : ""}><Link to="/charge">포인트 충전</Link></li>
+          <li className={location.pathname.startsWith("/usage") ? "active" : ""}><Link to="/usage">이용현황</Link></li>
+          <li className={location.pathname.startsWith("/gift") ? "active" : ""}><Link to="/gift">선물하기</Link></li>
+          <li className={location.pathname.startsWith("/settings") ? "active" : ""}><Link to="/settings">설정</Link></li>
+        </ul>
+      </aside>
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/members" element={<MemberList members={members} setMembers={setMembers} />} />
+          <Route path="/members/new" element={<MemberDetail members={members} onUpdate={handleAddMember} />} />
+          <Route path="/members/:id" element={<MemberDetail members={members} onUpdate={handleUpdateMember} />} />
+          <Route path="/gift" element={<GiftPage members={members} setMembers={setMembers} />} />
+          <Route path="/charge" element={<PointCharge />} />
+          <Route path="/settlement" element={<Settlement />} />
+          <Route path="/settlement/:id" element={<SettlementDetail />} />
+          <Route path="/usage" element={<UsageTable />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/departments" element={<DepartmentSettings departments={departments} onAddDepartment={handleAddDepartment} />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+// 설정 메인 페이지
+function Settings() {
+  const navigate = useNavigate();
+  
+  // 현재 관리자 정보 (실제로는 로그인 정보에서 가져옴)
+  const adminInfo = {
+    id: "admin@technoble.co.kr",
+    name: "김관리자",
+    phone: "010-1234-5678",
+    role: "시스템 관리자"
+  };
+
+  return (
+    <div className="settings-page">
+      <div className="settings-header">
+        <h2>설정</h2>
+      </div>
+
+      <div className="settings-content">
+        <div className="admin-info-section">
+          <h3>관리자 정보</h3>
+          <div className="admin-info-card">
+            <div className="info-item">
+              <label>현재 아이디</label>
+              <span>{adminInfo.id}</span>
+            </div>
+            <div className="info-item">
+              <label>담당자 성함</label>
+              <span>{adminInfo.name}</span>
+            </div>
+            <div className="info-item">
+              <label>연락처</label>
+              <span>{adminInfo.phone}</span>
+            </div>
+            <div className="info-item">
+              <label>권한</label>
+              <span>{adminInfo.role}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="settings-menu-section">
+          <h3>설정 메뉴</h3>
+          <div className="settings-menu-grid">
+            <div className="settings-menu-card" onClick={() => navigate("/settings/departments")}>
+              <div className="menu-icon">🏢</div>
+              <h4>부서 설정</h4>
+              <p>부서 및 팀 관리</p>
+              <div className="menu-arrow">→</div>
+            </div>
+            
+            <div className="settings-menu-card disabled">
+              <div className="menu-icon">👥</div>
+              <h4>권한 설정</h4>
+              <p>사용자 권한 관리</p>
+              <div className="menu-arrow">→</div>
+            </div>
+            
+            <div className="settings-menu-card disabled">
+              <div className="menu-icon">🔔</div>
+              <h4>알림 설정</h4>
+              <p>시스템 알림 관리</p>
+              <div className="menu-arrow">→</div>
+            </div>
+            
+            <div className="settings-menu-card disabled">
+              <div className="menu-icon">🔒</div>
+              <h4>보안 설정</h4>
+              <p>비밀번호 정책 설정</p>
+              <div className="menu-arrow">→</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 부서 설정 페이지
+function DepartmentSettings({ departments, onAddDepartment }) {
+  const navigate = useNavigate();
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newDepartment, setNewDepartment] = useState({
+    companyName: "테크노블",
+    departmentName: "",
+    teamName: ""
+  });
+
+  const handleAddDepartment = () => {
+    setShowAddModal(true);
+  };
+
+  const handleSaveDepartment = () => {
+    if (!newDepartment.departmentName || !newDepartment.teamName) {
+      alert("부서명과 팀명을 모두 입력해주세요.");
+      return;
+    }
+    
+    onAddDepartment(newDepartment);
+    setNewDepartment({
+      companyName: "테크노블",
+      departmentName: "",
+      teamName: ""
+    });
+    setShowAddModal(false);
+    alert("부서가 성공적으로 등록되었습니다.");
+  };
+
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setNewDepartment({
+      companyName: "테크노블",
+      departmentName: "",
+      teamName: ""
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewDepartment(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  return (
+    <div className="department-settings-page">
+      <div className="department-header">
+        <div className="header-left">
+          <button onClick={() => navigate("/settings")} className="back-btn">
+            ← 설정으로 돌아가기
+          </button>
+        </div>
+        <div className="header-center">
+          <h2>부서 설정</h2>
+        </div>
+        <div className="header-right">
+          <button className="add-dept-btn" onClick={handleAddDepartment}>
+            + 부서 등록
+          </button>
+        </div>
+      </div>
+
+      <div className="department-content">
+        <div className="department-list">
+          <h3>부서 목록</h3>
+          <div className="department-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>회사명</th>
+                  <th>부서명</th>
+                  <th>팀명</th>
+                  <th>전체명</th>
+                </tr>
+              </thead>
+              <tbody>
+                {departments.map((dept) => (
+                  <tr key={dept.id}>
+                    <td>{dept.companyName}</td>
+                    <td>{dept.departmentName}</td>
+                    <td>{dept.teamName}</td>
+                    <td className="full-name">
+                      {dept.companyName} {dept.departmentName} {dept.teamName}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* 부서 등록 모달 */}
+      {showAddModal && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="add-dept-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>부서 등록</h3>
+              <button className="close-btn" onClick={handleCloseModal}>×</button>
+            </div>
+            <div className="modal-content">
+              <div className="form-group">
+                <label>회사명</label>
+                <input
+                  type="text"
+                  name="companyName"
+                  value={newDepartment.companyName}
+                  onChange={handleInputChange}
+                  placeholder="회사명을 입력하세요"
+                />
+              </div>
+              <div className="form-group">
+                <label>부서명</label>
+                <input
+                  type="text"
+                  name="departmentName"
+                  value={newDepartment.departmentName}
+                  onChange={handleInputChange}
+                  placeholder="부서명을 입력하세요"
+                />
+              </div>
+              <div className="form-group">
+                <label>팀명</label>
+                <input
+                  type="text"
+                  name="teamName"
+                  value={newDepartment.teamName}
+                  onChange={handleInputChange}
+                  placeholder="팀명을 입력하세요"
+                />
+              </div>
+              <div className="preview-section">
+                <label>등록될 부서명</label>
+                <div className="preview-text">
+                  {newDepartment.companyName} {newDepartment.departmentName} {newDepartment.teamName}
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="cancel-btn" onClick={handleCloseModal}>취소</button>
+              <button className="save-btn" onClick={handleSaveDepartment}>등록하기</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // 개발용으로 true로 설정
+  const [members, setMembers] = useState(initialMembers);
+
+  // 신규 등록 시 상세페이지로 이동
+  const handleAddMember = (newMember) => {
+    const newId = Math.max(...members.map(m => m.id)) + 1;
+    setMembers(prev => [...prev, { ...newMember, id: newId }]);
+  };
+
+  // 상세/수정 저장
+  const handleUpdateMember = (updated) => {
+    setMembers(prev => prev.map(m => m.id === updated.id ? updated : m));
+  };
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<LoginPage onLogin={() => setIsLoggedIn(true)} />} />
+        <Route path="/*" element={isLoggedIn ? <AdminLayout members={members} setMembers={setMembers} handleAddMember={handleAddMember} handleUpdateMember={handleUpdateMember} /> : <Navigate to="/login" />} />
+        
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;

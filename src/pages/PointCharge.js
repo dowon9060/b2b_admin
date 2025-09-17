@@ -1,0 +1,175 @@
+import React, { useState } from 'react';
+import '../App.css';
+
+function PointCharge() {
+  const [selectedAmount, setSelectedAmount] = useState(100000);
+  const [customAmount, setCustomAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [isCharging, setIsCharging] = useState(false);
+
+  const presetAmounts = [50000, 100000, 200000, 500000, 1000000];
+
+  const handleAmountSelect = (amount) => {
+    setSelectedAmount(amount);
+    setCustomAmount('');
+  };
+
+  const handleCustomAmountChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setCustomAmount(value);
+    setSelectedAmount(parseInt(value) || 0);
+  };
+
+  const handleCharge = async () => {
+    if (selectedAmount < 10000) {
+      alert('최소 충전 금액은 10,000원입니다.');
+      return;
+    }
+
+    setIsCharging(true);
+    
+    // 실제 앱에서는 결제 API 호출
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 시뮬레이션
+      alert(`${selectedAmount.toLocaleString()}원이 성공적으로 충전되었습니다!`);
+      setSelectedAmount(100000);
+      setCustomAmount('');
+    } catch (error) {
+      alert('충전 중 오류가 발생했습니다. 다시 시도해 주세요.');
+    } finally {
+      setIsCharging(false);
+    }
+  };
+
+  return (
+    <div className="page-container">
+      <div className="page-header">
+        <h2>포인트 충전</h2>
+        <p>필요한 포인트를 충전하여 구성원들에게 선물하세요</p>
+      </div>
+
+      <div className="card">
+        <div className="card-header">
+          <h3>충전 금액 선택</h3>
+        </div>
+        <div className="card-content">
+          <div className="button-group">
+            {presetAmounts.map(amount => (
+              <button
+                key={amount}
+                className={`btn ${selectedAmount === amount ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => handleAmountSelect(amount)}
+              >
+                {amount.toLocaleString()}원
+              </button>
+            ))}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="customAmount">직접 입력</label>
+            <input
+              id="customAmount"
+              type="text"
+              placeholder="최소 10,000원"
+              value={customAmount}
+              onChange={handleCustomAmountChange}
+              className="form-control"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-header">
+          <h3>결제 방법</h3>
+        </div>
+        <div className="card-content">
+          <div className="radio-group">
+            <label className="radio-option">
+              <input
+                type="radio"
+                name="payment"
+                value="card"
+                checked={paymentMethod === 'card'}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              />
+              <span>신용카드</span>
+            </label>
+            <label className="radio-option">
+              <input
+                type="radio"
+                name="payment"
+                value="bank"
+                checked={paymentMethod === 'bank'}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              />
+              <span>계좌이체</span>
+            </label>
+            <label className="radio-option">
+              <input
+                type="radio"
+                name="payment"
+                value="virtual"
+                checked={paymentMethod === 'virtual'}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              />
+              <span>가상계좌</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-header">
+          <h3>충전 요약</h3>
+        </div>
+        <div className="card-content">
+          <div className="summary-list">
+            <div className="summary-item">
+              <span>충전 금액</span>
+              <span className="amount">{selectedAmount.toLocaleString()}원</span>
+            </div>
+            <div className="summary-item">
+              <span>적립 포인트</span>
+              <span className="points">{selectedAmount.toLocaleString()}P</span>
+            </div>
+            <div className="summary-item bonus">
+              <span>보너스 포인트</span>
+              <span className="bonus-points">+{Math.floor(selectedAmount * 0.05).toLocaleString()}P</span>
+            </div>
+            <div className="summary-divider"></div>
+            <div className="summary-item total">
+              <span>총 적립 포인트</span>
+              <span className="total-points">{(selectedAmount + Math.floor(selectedAmount * 0.05)).toLocaleString()}P</span>
+            </div>
+          </div>
+
+          <button 
+            className="btn btn-primary btn-large"
+            onClick={handleCharge}
+            disabled={isCharging || selectedAmount < 10000}
+          >
+            {isCharging ? '충전 중...' : '충전하기'}
+          </button>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-header">
+          <h3>이용 안내</h3>
+        </div>
+        <div className="card-content">
+          <ul>
+            <li>최소 충전 금액은 10,000원입니다.</li>
+            <li>충전된 포인트는 유효기간 없이 사용 가능합니다.</li>
+            <li>모든 충전에 대해 5% 보너스 포인트가 적립됩니다.</li>
+            <li>충전 후 포인트는 즉시 반영됩니다.</li>
+            <li>환불은 미사용 포인트에 한해 가능합니다.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default PointCharge;

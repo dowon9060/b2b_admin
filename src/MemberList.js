@@ -301,43 +301,43 @@ function MemberList({ members, setMembers }) {
     <div>
       <div className="member-table-header">
         <div className="search-filter-group">
-          <div className="view-mode-buttons">
-            <button 
-              className={`view-mode-btn ${viewMode === "list" ? "active" : ""}`}
-              onClick={() => setViewMode("list")}
-            >
-              📋 이름으로 보기
-            </button>
-            <button 
-              className={`view-mode-btn ${viewMode === "department" ? "active" : ""}`}
-              onClick={() => setViewMode("department")}
-            >
-              🏢 부서별 보기
-            </button>
-          </div>
-          <div className="search-controls">
+           <div className="card view-mode-card">
+             <button 
+               className={`btn ${viewMode === "list" ? "btn-primary" : "btn-secondary"}`}
+               onClick={() => setViewMode("list")}
+             >
+               이름으로 보기
+             </button>
+             <button 
+               className={`btn ${viewMode === "department" ? "btn-primary" : "btn-secondary"}`}
+               onClick={() => setViewMode("department")}
+             >
+               부서별 보기
+             </button>
+           </div>
+          <div className="card search-filter-card">
             <input
               type="text"
               placeholder="이름 검색"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ marginRight: "1rem" }}
+              className="form-control"
             />
-            <select value={dept} onChange={e => setDept(e.target.value)}>
+            <select value={dept} onChange={e => setDept(e.target.value)} className="form-control">
               {departments.map(d => (
                 <option key={d} value={d}>{d}</option>
               ))}
             </select>
           </div>
         </div>
-        <div className="action-buttons">
-          <button className="action-btn excel-upload-btn" onClick={handleExcelUpload}>
-            📊 엑셀 일괄 업로드
+        <div className="card action-buttons-card">
+          <button className="btn btn-secondary" onClick={handleExcelUpload}>
+            엑셀 일괄 업로드
           </button>
-          <button className="action-btn member-add-btn" onClick={handleAddMember}>
+          <button className="btn btn-primary" onClick={handleAddMember}>
             구성원 등록
           </button>
-          <button className="action-btn point-bulk-btn" onClick={handleBulkPoint}>
+          <button className="btn btn-success" onClick={handleBulkPoint}>
             포인트 일괄 지급
           </button>
         </div>
@@ -345,138 +345,145 @@ function MemberList({ members, setMembers }) {
 
       {/* 이름으로 보기 - 기존 테이블 */}
       {viewMode === "list" && (
-        <table className="member-table">
-          <thead>
-            <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  checked={selected.length === filtered.length && filtered.length > 0}
-                  onChange={e => handleSelectAll(e.target.checked)}
-                />
-              </th>
-              <th>이름</th>
-              <th>부서</th>
-              <th>사원번호</th>
-              <th>포인트</th>
-              <th>입사일</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(m => (
-              <tr key={m.id} onClick={() => handleRowClick(m.id)} style={{ cursor: "pointer" }}>
-                <td onClick={(e) => e.stopPropagation()}>
+        <div className="card">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>
                   <input
                     type="checkbox"
-                    checked={selected.includes(m.id)}
-                    onChange={() => handleSelect(m.id)}
+                    checked={selected.length === filtered.length && filtered.length > 0}
+                    onChange={e => handleSelectAll(e.target.checked)}
                   />
-                </td>
-                <td>{m.name}</td>
-                <td>{m.department}</td>
-                <td>{m.empNo}</td>
-                <td>{m.point}</td>
-                <td>{m.joinDate}</td>
+                </th>
+                <th>이름</th>
+                <th>부서</th>
+                <th>사원번호</th>
+                <th>포인트</th>
+                <th>입사일</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map(m => (
+                <tr key={m.id} onClick={() => handleRowClick(m.id)} style={{ cursor: "pointer" }}>
+                  <td onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(m.id)}
+                      onChange={() => handleSelect(m.id)}
+                    />
+                  </td>
+                  <td>{m.name}</td>
+                  <td>{m.department}</td>
+                  <td>{m.empNo}</td>
+                  <td>{m.point.toLocaleString()}P</td>
+                  <td>{m.joinDate}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* 부서별 보기 */}
       {viewMode === "department" && (
-        <div className="department-view">
-          {Object.entries(groupedByDepartment).map(([department, members]) => {
-            const isCollapsed = collapsedDepts[department];
-            return (
-              <div key={department} className="department-section">
-                <div 
-                  className="department-header-compact" 
-                  onClick={() => toggleDepartment(department)}
-                >
-                  <div className="department-toggle">
-                    <span className={`toggle-icon ${isCollapsed ? 'collapsed' : ''}`}>▼</span>
-                    <span className="department-title">{department}</span>
-                    <span className="department-count">({members.length}명)</span>
+        <div className="card">
+          <div className="card-content">
+            {Object.entries(groupedByDepartment).map(([department, members]) => {
+              const isCollapsed = collapsedDepts[department];
+              return (
+                <div key={department} className="card department-card">
+                  <div 
+                    className="card-header department-header" 
+                    onClick={() => toggleDepartment(department)}
+                  >
+                    <div className="department-info">
+                      <span className={`toggle-icon ${isCollapsed ? 'collapsed' : ''}`}>▼</span>
+                      <span className="department-title">{department}</span>
+                      <span className="department-count">({members.length}명)</span>
+                    </div>
+                    <div className="department-total-points">
+                      {members.reduce((sum, m) => sum + m.point, 0).toLocaleString()}P
+                    </div>
                   </div>
-                  <div className="department-total-points">
-                    {members.reduce((sum, m) => sum + m.point, 0).toLocaleString()}P
-                  </div>
-                </div>
-                
-                {!isCollapsed && (
-                  <div className="department-member-list">
-                    {members.map(m => (
-                      <div key={m.id} className="member-row-card" onClick={() => handleRowClick(m.id)}>
-                        <div className="member-checkbox-area" onClick={(e) => e.stopPropagation()}>
-                          <input
-                            type="checkbox"
-                            checked={selected.includes(m.id)}
-                            onChange={() => handleSelect(m.id)}
-                          />
-                        </div>
-                        <div className="member-info">
-                          <div className="member-name-primary">{m.name}</div>
-                          <div className="member-details-row">
-                            <span className="member-emp-info">사번: {m.empNo}</span>
-                            <span className="member-join-info">입사: {m.joinDate}</span>
-                            <span className="member-phone-info">연락처: {m.phone || '010-0000-0000'}</span>
+                  
+                  {!isCollapsed && (
+                    <div className="card-content">
+                      {members.map(m => (
+                        <div key={m.id} className="card member-card" onClick={() => handleRowClick(m.id)}>
+                          <div className="member-checkbox" onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={selected.includes(m.id)}
+                              onChange={() => handleSelect(m.id)}
+                            />
+                          </div>
+                          <div className="member-info">
+                            <div className="member-name">{m.name}</div>
+                            <div className="member-details">
+                              <span>사번: {m.empNo}</span>
+                              <span>입사: {m.joinDate}</span>
+                              <span>연락처: {m.phone || '010-0000-0000'}</span>
+                            </div>
+                          </div>
+                          <div className="member-points">
+                            {m.point.toLocaleString()}P
                           </div>
                         </div>
-                        <div className="member-point-display">
-                          {m.point.toLocaleString()}P
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
       {/* 포인트 일괄지급 모달 */}
       {showBulkModal && (
         <div className="modal-overlay" onClick={() => setShowBulkModal(false)}>
-          <div className="bulk-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
+          <div className="card modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="card-header">
               <h3>포인트 일괄 지급</h3>
-              <button className="close-btn" onClick={() => setShowBulkModal(false)}>×</button>
+              <button className="btn btn-secondary" onClick={() => setShowBulkModal(false)}>×</button>
             </div>
             
-            <div className="modal-content">
-              <div className="selected-info">
+            <div className="card-content">
+              <div className="card info-card">
                 <span>선택된 구성원: <strong>{selected.length}명</strong></span>
               </div>
 
-              <div className="date-section">
+              <div className="card">
                 <h4>기간 설정</h4>
-                <div className="date-inputs">
-                  <div>
+                <div className="form-row">
+                  <div className="form-group">
                     <label>시작일:</label>
                     <input
                       type="date"
                       value={bulkPointData.startDate}
                       onChange={(e) => setBulkPointData({...bulkPointData, startDate: e.target.value})}
+                      className="form-control"
                     />
                   </div>
-                  <div>
+                  <div className="form-group">
                     <label>종료일:</label>
                     <input
                       type="date"
                       value={bulkPointData.endDate}
                       onChange={(e) => setBulkPointData({...bulkPointData, endDate: e.target.value})}
+                      className="form-control"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="quarter-section">
+              <div className="card">
                 <h4>분기 설정</h4>
                 <select
                   value={bulkPointData.quarter}
                   onChange={(e) => setBulkPointData({...bulkPointData, quarter: e.target.value})}
+                  className="form-control"
                 >
                   <option value="1분기">1분기</option>
                   <option value="2분기">2분기</option>
@@ -485,30 +492,30 @@ function MemberList({ members, setMembers }) {
                 </select>
               </div>
 
-              <div className="point-section">
+              <div className="card">
                 <h4>포인트 선택</h4>
-                <div className="point-buttons">
+                <div className="button-group">
                   <button
-                    className={`point-btn ${bulkPointData.pointAmount === 100000 ? 'selected' : ''}`}
+                    className={`btn ${bulkPointData.pointAmount === 100000 ? 'btn-primary' : 'btn-secondary'}`}
                     onClick={() => handlePointAmountSelect(100000)}
                   >
                     10만
                   </button>
                   <button
-                    className={`point-btn ${bulkPointData.pointAmount === 200000 ? 'selected' : ''}`}
+                    className={`btn ${bulkPointData.pointAmount === 200000 ? 'btn-primary' : 'btn-secondary'}`}
                     onClick={() => handlePointAmountSelect(200000)}
                   >
                     20만
                   </button>
                   <button
-                    className={`point-btn ${bulkPointData.pointAmount === 300000 ? 'selected' : ''}`}
+                    className={`btn ${bulkPointData.pointAmount === 300000 ? 'btn-primary' : 'btn-secondary'}`}
                     onClick={() => handlePointAmountSelect(300000)}
                   >
                     30만
                   </button>
                 </div>
                 
-                <div className="custom-input">
+                <div className="form-group">
                   <label>수기 입력:</label>
                   <input
                     type="number"
@@ -516,12 +523,13 @@ function MemberList({ members, setMembers }) {
                     onChange={(e) => handleCustomAmountChange(e.target.value)}
                     placeholder="포인트를 입력하세요"
                     min="1000"
+                    className="form-control"
                   />
                   <span>포인트</span>
                 </div>
               </div>
 
-              <div className="summary-section">
+              <div className="card summary-card">
                 <div className="summary-item">
                   <span>선택된 구성원:</span>
                   <span>{selected.length}명</span>
@@ -539,24 +547,24 @@ function MemberList({ members, setMembers }) {
               </div>
             </div>
 
-            <div className="modal-footer">
-              <button className="cancel-btn" onClick={() => setShowBulkModal(false)}>취소</button>
-              <button className="issue-btn" onClick={handleFinalIssue}>최종 발급하기</button>
+            <div className="card-footer">
+              <button className="btn btn-secondary" onClick={() => setShowBulkModal(false)}>취소</button>
+              <button className="btn btn-primary" onClick={handleFinalIssue}>최종 발급하기</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 구성원 등록 바텀시트 */}
+      {/* 구성원 등록 모달 */}
       {showAddModal && (
-        <div className="modal-overlay bottom-sheet" onClick={() => setShowAddModal(false)}>
-          <div className="add-member-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
+        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
+          <div className="card modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="card-header">
               <h3>새 구성원 등록</h3>
-              <button className="close-btn" onClick={() => setShowAddModal(false)}>×</button>
+              <button className="btn btn-secondary" onClick={() => setShowAddModal(false)}>×</button>
             </div>
             
-            <div className="modal-content">
+            <div className="card-content">
               <div className="add-member-form">
                 <div className="form-row">
                   <div className="form-group">
@@ -657,9 +665,9 @@ function MemberList({ members, setMembers }) {
               </div>
             </div>
 
-            <div className="modal-footer">
-              <button className="cancel-btn" onClick={() => setShowAddModal(false)}>취소</button>
-              <button className="save-btn" onClick={handleSaveNewMember}>저장하기</button>
+            <div className="card-footer">
+              <button className="btn btn-secondary" onClick={() => setShowAddModal(false)}>취소</button>
+              <button className="btn btn-primary" onClick={handleSaveNewMember}>저장하기</button>
             </div>
           </div>
         </div>
@@ -668,14 +676,14 @@ function MemberList({ members, setMembers }) {
       {/* 엑셀 업로드 모달 */}
       {showExcelModal && (
         <div className="modal-overlay" onClick={() => setShowExcelModal(false)}>
-          <div className="excel-upload-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>📊 엑셀 일괄 업로드</h3>
-              <button className="close-btn" onClick={() => setShowExcelModal(false)}>×</button>
+          <div className="card modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="card-header">
+              <h3>엑셀 일괄 업로드</h3>
+              <button className="btn btn-secondary" onClick={() => setShowExcelModal(false)}>×</button>
             </div>
             
-            <div className="modal-content">
-              <div className="upload-info">
+            <div className="card-content">
+              <div className="card">
                 <h4>업로드 안내</h4>
                 <ul>
                   <li>엑셀 파일(.xlsx, .xls) 또는 CSV 파일(.csv)을 업로드할 수 있습니다.</li>
@@ -685,13 +693,13 @@ function MemberList({ members, setMembers }) {
                 </ul>
               </div>
 
-              <div className="template-download">
-                <button className="template-btn" onClick={handleDownloadTemplate}>
-                  📥 업로드 템플릿 다운로드
+              <div className="card">
+                <button className="btn btn-secondary" onClick={handleDownloadTemplate}>
+                  업로드 템플릿 다운로드
                 </button>
               </div>
 
-              <div className="file-upload-section">
+              <div className="card">
                 <h4>파일 선택</h4>
                 <div className="file-input-wrapper">
                   <input
@@ -701,14 +709,14 @@ function MemberList({ members, setMembers }) {
                     onChange={handleFileSelect}
                     style={{ display: 'none' }}
                   />
-                  <label htmlFor="excel-file" className="file-select-btn">
-                    📁 파일 찾기
+                  <label htmlFor="excel-file" className="btn btn-primary">
+                    파일 찾기
                   </label>
                   {selectedFile && (
-                    <div className="selected-file">
+                    <div className="selected-file-info">
                       <span>선택된 파일: {selectedFile.name}</span>
                       <button 
-                        className="remove-file-btn" 
+                        className="btn btn-secondary" 
                         onClick={() => setSelectedFile(null)}
                       >
                         ×
@@ -719,7 +727,7 @@ function MemberList({ members, setMembers }) {
               </div>
 
               {isUploading && (
-                <div className="upload-progress">
+                <div className="card">
                   <h4>업로드 진행 중...</h4>
                   <div className="progress-bar">
                     <div 
@@ -732,12 +740,12 @@ function MemberList({ members, setMembers }) {
               )}
             </div>
 
-            <div className="modal-footer">
-              <button className="cancel-btn" onClick={() => setShowExcelModal(false)} disabled={isUploading}>
+            <div className="card-footer">
+              <button className="btn btn-secondary" onClick={() => setShowExcelModal(false)} disabled={isUploading}>
                 취소
               </button>
               <button 
-                className="upload-btn" 
+                className="btn btn-primary" 
                 onClick={handleFileUpload}
                 disabled={!selectedFile || isUploading}
               >
