@@ -37,11 +37,8 @@ function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember 
             <li className={location.pathname.startsWith("/members") ? "active" : ""}>
               <Link to="/members">구성원관리</Link>
             </li>
-            <li className={location.pathname === "/charge" ? "active" : ""}>
+            <li className={location.pathname.startsWith("/charge") ? "active" : ""}>
               <Link to="/charge">포인트 충전</Link>
-            </li>
-            <li className={location.pathname.startsWith("/charge/history") ? "active" : ""}>
-              <Link to="/charge/history">내역관리</Link>
             </li>
             <li className={location.pathname.startsWith("/usage") ? "active" : ""}>
               <Link to="/usage">이용현황</Link>
@@ -63,7 +60,6 @@ function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember 
           <Route path="/members/:id" element={<MemberDetail members={members} onUpdate={handleUpdateMember} />} />
           <Route path="/gift" element={<GiftPage members={members} setMembers={setMembers} />} />
           <Route path="/charge" element={<PointCharge />} />
-          <Route path="/charge/history" element={<Settlement />} />
           <Route path="/charge/history/:month" element={<SettlementDetail />} />
           <Route path="/usage" element={<UsageTable />} />
           <Route path="/settings" element={<Settings />} />

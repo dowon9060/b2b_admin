@@ -939,6 +939,40 @@ body {
   color: var(--primary);
 }
 
+/* 탭 네비게이션 */
+.tab-navigation {
+  display: flex;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2);
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+}
+
+.tab-button {
+  flex: 1;
+  padding: var(--spacing-3) var(--spacing-4);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  background: var(--gray-100);
+  color: var(--gray-800);
+}
+
+.tab-button.active {
+  background: white;
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
 /* 정산 상세페이지 */
 .settlement-detail-grid {
   display: grid;

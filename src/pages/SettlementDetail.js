@@ -1,11 +1,12 @@
 import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { usageData } from "../utils/mockData";
 import { formatNumber } from "../utils/pointUtils";
 
 function SettlementDetail() {
   const { month } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // 해당 월의 사용 데이터 필터링 (실제로는 API에서 가져옴)
   const monthlyUsage = usageData.filter(usage => 
@@ -38,7 +39,9 @@ function SettlementDetail() {
         <div className="card-content">
           <button 
             className="btn btn-secondary" 
-            onClick={() => navigate('/charge/history')}
+            onClick={() => navigate('/charge', { 
+              state: { activeTab: location.state?.activeTab || 'charge' } 
+            })}
           >
             ← 돌아가기
           </button>
