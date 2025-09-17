@@ -38,7 +38,7 @@ function SettlementDetail() {
         <div className="card-content">
           <button 
             className="btn btn-secondary" 
-            onClick={() => navigate('/settlement')}
+            onClick={() => navigate('/charge/history')}
           >
             ← 돌아가기
           </button>

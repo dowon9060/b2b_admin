@@ -9,7 +9,8 @@ function Settlement() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h2>정산</h2>
+        <h2>내역관리</h2>
+        <p>포인트 충전 및 사용 내역을 확인하고 관리할 수 있습니다</p>
       </div>
       
       <div className="stats-grid">
@@ -58,7 +59,7 @@ function Settlement() {
                   <td>
                     <button 
                       className="btn btn-primary"
-                      onClick={() => navigate(`/settlement/${item.month}`)}
+                      onClick={() => navigate(`/charge/history/${item.month}`)}
                     >
                       상세보기
                     </button>
