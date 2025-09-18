@@ -246,7 +246,7 @@ function PointCharge() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h2>포인트 충전</h2>
+        <h2>포인트</h2>
         <p>포인트를 충전하고 사용 내역을 관리할 수 있습니다</p>
       </div>
 

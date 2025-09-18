@@ -38,7 +38,7 @@ function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember 
               <Link to="/members">구성원관리</Link>
             </li>
             <li className={location.pathname.startsWith("/charge") ? "active" : ""}>
-              <Link to="/charge">포인트 충전</Link>
+              <Link to="/charge">포인트</Link>
             </li>
             <li className={location.pathname.startsWith("/usage") ? "active" : ""}>
               <Link to="/usage">이용현황</Link>
