@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { adminUsers, adminRoles } from "../utils/mockData";
-import { formatNumber } from "../utils/pointUtils";
+import { useToast } from "../hooks/useToast";
+import Toast from "../components/Toast";
 
 function UserManagement() {
   const [users, setUsers] = useState(adminUsers);
@@ -14,6 +15,7 @@ function UserManagement() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [filter, setFilter] = useState('all'); // all, active, inactive
+  const { toasts, removeToast, success, error, warning, info } = useToast();
 
   // 필터링된 사용자 목록
   const filteredUsers = users.filter(user => {
@@ -24,13 +26,13 @@ function UserManagement() {
   // 새 사용자 추가
   const handleAddUser = async () => {
     if (!newUser.name || !newUser.email || !newUser.phone) {
-      alert('모든 필드를 입력해주세요.');
+      warning('모든 필드를 입력해주세요.');
       return;
     }
 
     // 이메일 중복 체크
     if (users.find(u => u.email === newUser.email)) {
-      alert('이미 존재하는 이메일입니다.');
+      error('이미 존재하는 이메일입니다.');
       return;
     }
 
@@ -55,9 +57,9 @@ function UserManagement() {
       setUsers([...users, userToAdd]);
       setNewUser({ name: '', email: '', phone: '', role: 'viewer' });
       setShowAddModal(false);
-      alert('관리자가 성공적으로 추가되었습니다.');
+      success(`${newUser.name}님이 관리자로 추가되었습니다.`);
     } catch (error) {
-      alert('관리자 추가 중 오류가 발생했습니다.');
+      error('관리자 추가 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
     }
@@ -67,7 +69,7 @@ function UserManagement() {
   const handleToggleStatus = async (userId) => {
     const user = users.find(u => u.id === userId);
     if (user.role === 'super_admin') {
-      alert('최고 관리자는 비활성화할 수 없습니다.');
+      warning('최고 관리자는 비활성화할 수 없습니다.');
       return;
     }
 
@@ -76,9 +78,9 @@ function UserManagement() {
       setUsers(users.map(u => 
         u.id === userId ? { ...u, status: newStatus } : u
       ));
-      alert(`${user.name}님이 ${newStatus === 'active' ? '활성화' : '비활성화'}되었습니다.`);
+      success(`${user.name}님이 ${newStatus === 'active' ? '활성화' : '비활성화'}되었습니다.`);
     } catch (error) {
-      alert('상태 변경 중 오류가 발생했습니다.');
+      error('상태 변경 중 오류가 발생했습니다.');
     }
   };
 
@@ -86,7 +88,7 @@ function UserManagement() {
   const handleDeleteUser = async (userId) => {
     const user = users.find(u => u.id === userId);
     if (user.role === 'super_admin') {
-      alert('최고 관리자는 삭제할 수 없습니다.');
+      warning('최고 관리자는 삭제할 수 없습니다.');
       return;
     }
 
@@ -96,9 +98,9 @@ function UserManagement() {
 
     try {
       setUsers(users.filter(u => u.id !== userId));
-      alert('관리자가 삭제되었습니다.');
+      success(`${user.name}님이 삭제되었습니다.`);
     } catch (error) {
-      alert('삭제 중 오류가 발생했습니다.');
+      error('삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -106,7 +108,7 @@ function UserManagement() {
   const handleRoleChange = async (userId, newRole) => {
     const user = users.find(u => u.id === userId);
     if (user.role === 'super_admin') {
-      alert('최고 관리자의 권한은 변경할 수 없습니다.');
+      warning('최고 관리자의 권한은 변경할 수 없습니다.');
       return;
     }
 
@@ -115,9 +117,9 @@ function UserManagement() {
       setUsers(users.map(u => 
         u.id === userId ? { ...u, role: newRole, roleLabel: selectedRole.label } : u
       ));
-      alert(`${user.name}님의 권한이 ${selectedRole.label}로 변경되었습니다.`);
+      success(`${user.name}님의 권한이 ${selectedRole.label}로 변경되었습니다.`);
     } catch (error) {
-      alert('권한 변경 중 오류가 발생했습니다.');
+      error('권한 변경 중 오류가 발생했습니다.');
     }
   };
 
@@ -185,7 +187,7 @@ function UserManagement() {
               className="btn btn-primary"
               onClick={() => setShowAddModal(true)}
             >
-              관리자 추가
+              ➕ 관리자 추가
             </button>
           </div>
         </div>
@@ -197,34 +199,129 @@ function UserManagement() {
           <h3>관리자 목록</h3>
         </div>
         <div className="card-content">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>이름</th>
-                <th>이메일</th>
-                <th>연락처</th>
-                <th>권한</th>
-                <th>상태</th>
-                <th>마지막 로그인</th>
-                <th>관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map(user => (
-                <tr key={user.id}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
-                  <td>
-                    {user.role === 'super_admin' ? (
-                      <span className={getRoleBadgeClass(user.role)}>
-                        {user.roleLabel}
-                      </span>
-                    ) : (
+          {/* 데스크톱 테이블 뷰 */}
+          <div className="desktop-table-view">
+            {filteredUsers.length > 0 ? (
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>연락처</th>
+                    <th>권한</th>
+                    <th>상태</th>
+                    <th>마지막 로그인</th>
+                    <th>관리</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.map(user => (
+                    <tr key={user.id}>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>{user.phone}</td>
+                      <td>
+                        {user.role === 'super_admin' ? (
+                          <span className={getRoleBadgeClass(user.role)}>
+                            {user.roleLabel}
+                          </span>
+                        ) : (
+                          <select
+                            value={user.role}
+                            onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                            className="form-control role-select"
+                          >
+                            {adminRoles.filter(r => r.id !== 'super_admin').map(role => (
+                              <option key={role.id} value={role.id}>
+                                {role.label}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </td>
+                      <td>
+                        <span className={getStatusBadgeClass(user.status)}>
+                          {user.status === 'active' ? '활성' : '비활성'}
+                        </span>
+                      </td>
+                      <td>{user.lastLogin}</td>
+                      <td>
+                        <div className="action-buttons">
+                          {user.role !== 'super_admin' && (
+                            <>
+                              <button
+                                className={`btn btn-sm ${user.status === 'active' ? 'btn-warning' : 'btn-success'}`}
+                                onClick={() => handleToggleStatus(user.id)}
+                              >
+                                {user.status === 'active' ? '⏸ 비활성화' : '▶ 활성화'}
+                              </button>
+                              <button
+                                className="btn btn-sm btn-danger"
+                                onClick={() => handleDeleteUser(user.id)}
+                              >
+                                🗑 삭제
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="empty-state">
+                <div className="empty-state-icon">👥</div>
+                <h3>등록된 관리자가 없습니다</h3>
+                <p>새로운 관리자를 추가하여 시스템을 관리해보세요.</p>
+              </div>
+            )}
+          </div>
+
+          {/* 모바일 카드 뷰 */}
+          <div className="mobile-card-view">
+            {filteredUsers.length > 0 ? (
+              filteredUsers.map(user => (
+                <div key={user.id} className="user-card">
+                  <div className="user-card-header">
+                    <div className="user-card-info">
+                      <h4>{user.name}</h4>
+                      <div className="email">{user.email}</div>
+                    </div>
+                    <span className={getStatusBadgeClass(user.status)}>
+                      {user.status === 'active' ? '활성' : '비활성'}
+                    </span>
+                  </div>
+
+                  <div className="user-card-details">
+                    <div className="user-card-detail">
+                      <div className="label">연락처</div>
+                      <div className="value">{user.phone}</div>
+                    </div>
+                    <div className="user-card-detail">
+                      <div className="label">권한</div>
+                      <div className="value">
+                        <span className={getRoleBadgeClass(user.role)}>
+                          {user.roleLabel}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="user-card-detail">
+                      <div className="label">마지막 로그인</div>
+                      <div className="value">{user.lastLogin}</div>
+                    </div>
+                    <div className="user-card-detail">
+                      <div className="label">가입일</div>
+                      <div className="value">{user.createdDate}</div>
+                    </div>
+                  </div>
+
+                  {user.role !== 'super_admin' && (
+                    <div className="user-card-actions">
                       <select
                         value={user.role}
                         onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                        className="form-control role-select"
+                        className="form-control"
                       >
                         {adminRoles.filter(r => r.id !== 'super_admin').map(role => (
                           <option key={role.id} value={role.id}>
@@ -232,38 +329,30 @@ function UserManagement() {
                           </option>
                         ))}
                       </select>
-                    )}
-                  </td>
-                  <td>
-                    <span className={getStatusBadgeClass(user.status)}>
-                      {user.status === 'active' ? '활성' : '비활성'}
-                    </span>
-                  </td>
-                  <td>{user.lastLogin}</td>
-                  <td>
-                    <div className="action-buttons">
-                      {user.role !== 'super_admin' && (
-                        <>
-                          <button
-                            className={`btn btn-sm ${user.status === 'active' ? 'btn-warning' : 'btn-success'}`}
-                            onClick={() => handleToggleStatus(user.id)}
-                          >
-                            {user.status === 'active' ? '비활성화' : '활성화'}
-                          </button>
-                          <button
-                            className="btn btn-sm btn-danger"
-                            onClick={() => handleDeleteUser(user.id)}
-                          >
-                            삭제
-                          </button>
-                        </>
-                      )}
+                      <button
+                        className={`btn ${user.status === 'active' ? 'btn-warning' : 'btn-success'}`}
+                        onClick={() => handleToggleStatus(user.id)}
+                      >
+                        {user.status === 'active' ? '⏸ 비활성화' : '▶ 활성화'}
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        🗑 삭제
+                      </button>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <div className="empty-state-icon">👥</div>
+                <h3>등록된 관리자가 없습니다</h3>
+                <p>새로운 관리자를 추가하여 시스템을 관리해보세요.</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -362,19 +451,34 @@ function UserManagement() {
                 onClick={() => setShowAddModal(false)}
                 disabled={isSubmitting}
               >
-                취소
+                ✕ 취소
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handleAddUser}
                 disabled={isSubmitting || !newUser.name || !newUser.email || !newUser.phone}
               >
-                {isSubmitting ? '추가 중...' : '관리자 추가'}
+                {isSubmitting && <div className="loading-spinner"></div>}
+                {isSubmitting ? '추가 중...' : '✓ 관리자 추가'}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* 토스트 알림 */}
+      <div className="toast-container">
+        {toasts.map(toast => (
+          <Toast
+            key={toast.id}
+            type={toast.type}
+            title={toast.title}
+            message={toast.message}
+            onClose={() => removeToast(toast.id)}
+            duration={toast.duration}
+          />
+        ))}
+      </div>
     </div>
   );
 }
