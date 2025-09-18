@@ -21,8 +21,24 @@ function MemberDetail({ members, setMembers }) {
   // 구성원의 사용 포인트 계산
   const memberUsage = member ? usageData.filter(usage => usage.memberName === member.name) : [];
   const totalUsedPoints = memberUsage.reduce((sum, usage) => sum + usage.points, 0);
-  const totalUsedAmount = memberUsage.reduce((sum, usage) => sum + usage.amount, 0);
   const usageCount = memberUsage.length;
+
+  // 이용권 기간 정보 생성 (실제 앱에서는 서버에서 받아옴)
+  const getUsagePeriod = (usageDate, points) => {
+    const startDate = new Date(usageDate);
+    let days = 30; // 기본 30일
+    
+    // 포인트에 따른 이용 기간 설정
+    if (points >= 50000) days = 90; // 3개월
+    else if (points >= 30000) days = 60; // 2개월
+    else if (points >= 20000) days = 30; // 1개월
+    else days = 7; // 1주일
+    
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + days);
+    
+    return `${startDate.toLocaleDateString()} ~ ${endDate.toLocaleDateString()}`;
+  };
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
@@ -268,12 +284,6 @@ function MemberDetail({ members, setMembers }) {
               </div>
             </div>
             <div className="card stat-card">
-              <div className="stat-label">총 사용 금액</div>
-              <div className="stat-value" style={{ color: 'var(--warning)' }}>
-                {totalUsedAmount.toLocaleString()}원
-              </div>
-            </div>
-            <div className="card stat-card">
               <div className="stat-label">이용 건수</div>
               <div className="stat-value" style={{ color: 'var(--info)' }}>
                 {usageCount}건
@@ -294,19 +304,17 @@ function MemberDetail({ members, setMembers }) {
             <table className="table">
               <thead>
                 <tr>
-                  <th>이용일</th>
-                  <th>시설명</th>
+                  <th>결제일</th>
                   <th>사용 포인트</th>
-                  <th>사용 금액</th>
+                  <th>이용권 기간</th>
                 </tr>
               </thead>
               <tbody>
                 {memberUsage.slice(0, 10).map((usage, index) => (
                   <tr key={index}>
                     <td>{usage.usageDate}</td>
-                    <td>{usage.facility}</td>
                     <td>{usage.points.toLocaleString()}P</td>
-                    <td>{usage.amount.toLocaleString()}원</td>
+                    <td>{getUsagePeriod(usage.usageDate, usage.points)}</td>
                   </tr>
                 ))}
               </tbody>
