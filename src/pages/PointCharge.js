@@ -8,7 +8,7 @@ function PointCharge() {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('charge');
-  const [selectedAmount, setSelectedAmount] = useState(100000);
+  const [selectedAmount, setSelectedAmount] = useState(0);
   const [customAmount, setCustomAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isCharging, setIsCharging] = useState(false);
@@ -23,7 +23,12 @@ function PointCharge() {
   const presetAmounts = [50000, 100000, 200000, 500000, 1000000];
 
   const handleAmountSelect = (amount) => {
-    setSelectedAmount(amount);
+    setSelectedAmount(prev => prev + amount); // 금액 누적
+    setCustomAmount('');
+  };
+
+  const handleResetAmount = () => {
+    setSelectedAmount(0);
     setCustomAmount('');
   };
 
@@ -45,7 +50,7 @@ function PointCharge() {
     try {
       await new Promise(resolve => setTimeout(resolve, 2000)); // 시뮬레이션
       alert(`${selectedAmount.toLocaleString()}원이 성공적으로 충전되었습니다!`);
-      setSelectedAmount(100000);
+      setSelectedAmount(0);
       setCustomAmount('');
     } catch (error) {
       alert('충전 중 오류가 발생했습니다. 다시 시도해 주세요.');
@@ -61,16 +66,30 @@ function PointCharge() {
           <h3>충전 금액 선택</h3>
         </div>
         <div className="card-content">
-          <div className="button-group">
-            {presetAmounts.map(amount => (
-              <button
-                key={amount}
-                className={`btn ${selectedAmount === amount ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => handleAmountSelect(amount)}
+          <div className="charge-controls">
+            <div className="button-group">
+              {presetAmounts.map(amount => (
+                <button
+                  key={amount}
+                  className="btn btn-secondary"
+                  onClick={() => handleAmountSelect(amount)}
+                >
+                  +{amount.toLocaleString()}원
+                </button>
+              ))}
+            </div>
+            <div className="amount-controls">
+              <div className="current-amount">
+                현재 선택된 금액: <span className="amount-value">{selectedAmount.toLocaleString()}원</span>
+              </div>
+              <button 
+                className="btn btn-outline"
+                onClick={handleResetAmount}
+                disabled={selectedAmount === 0}
               >
-                {amount.toLocaleString()}원
+                초기화
               </button>
-            ))}
+            </div>
           </div>
 
           <div className="form-group">
@@ -137,18 +156,9 @@ function PointCharge() {
               <span>충전 금액</span>
               <span className="amount">{selectedAmount.toLocaleString()}원</span>
             </div>
-            <div className="summary-item">
-              <span>적립 포인트</span>
-              <span className="points">{selectedAmount.toLocaleString()}P</span>
-            </div>
-            <div className="summary-item bonus">
-              <span>보너스 포인트</span>
-              <span className="bonus-points">+{Math.floor(selectedAmount * 0.05).toLocaleString()}P</span>
-            </div>
-            <div className="summary-divider"></div>
             <div className="summary-item total">
-              <span>총 적립 포인트</span>
-              <span className="total-points">{(selectedAmount + Math.floor(selectedAmount * 0.05)).toLocaleString()}P</span>
+              <span>적립 포인트</span>
+              <span className="total-points">{selectedAmount.toLocaleString()}P</span>
             </div>
           </div>
 
@@ -170,7 +180,6 @@ function PointCharge() {
           <ul>
             <li>최소 충전 금액은 10,000원입니다.</li>
             <li>충전된 포인트는 유효기간 없이 사용 가능합니다.</li>
-            <li>모든 충전에 대해 5% 보너스 포인트가 적립됩니다.</li>
             <li>충전 후 포인트는 즉시 반영됩니다.</li>
             <li>환불은 미사용 포인트에 한해 가능합니다.</li>
           </ul>
