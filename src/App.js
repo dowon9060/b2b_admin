@@ -35,11 +35,14 @@ function App() {
               path="/*" 
               element={
                 isLoggedIn ? (
-                  <AdminLayout 
+                  <AdminLayout
                     members={members}
                     setMembers={setMembers}
                     handleAddMember={handleAddMember}
                     handleUpdateMember={handleUpdateMember}
+                    companyPoints={companyPoints}
+                    handleRecoverPoints={handleRecoverPoints}
+                    handleDeductCompanyPoints={handleDeductCompanyPoints}
                   />
                 ) : (
                   <Navigate to="/login" />

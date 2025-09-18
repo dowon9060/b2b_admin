@@ -11,7 +11,7 @@ import UsageTable from "../pages/UsageTable";
 import Settings from "../pages/Settings";
 import DepartmentSettings from "../pages/DepartmentSettings";
 
-function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember }) {
+function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember, companyPoints, handleRecoverPoints, handleDeductCompanyPoints }) {
   const location = useLocation();
   const [departments, setDepartments] = useState([
     { id: 1, companyName: "도원컴퍼니", departmentName: "영업부", teamName: "영업1팀" },
