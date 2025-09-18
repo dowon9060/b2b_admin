@@ -249,3 +249,68 @@ export const giftHistory = [
     usageStatus: "사용완료"
   }
 ];
+
+// 관리자 계정 데이터
+export const adminUsers = [
+  {
+    id: 1,
+    name: "관리자",
+    email: "admin@doowoncompany.com",
+    phone: "010-1234-5678",
+    role: "super_admin",
+    roleLabel: "최고 관리자",
+    createdDate: "2024-01-01",
+    lastLogin: "2024-12-18 14:30",
+    status: "active"
+  },
+  {
+    id: 2,
+    name: "김부장",
+    email: "kim.manager@doowoncompany.com",
+    phone: "010-2345-6789",
+    role: "admin",
+    roleLabel: "관리자",
+    createdDate: "2024-06-15",
+    lastLogin: "2024-12-18 09:15",
+    status: "active"
+  },
+  {
+    id: 3,
+    name: "이과장",
+    email: "lee.leader@doowoncompany.com",
+    phone: "010-3456-7890",
+    role: "manager",
+    roleLabel: "매니저",
+    createdDate: "2024-08-20",
+    lastLogin: "2024-12-17 16:45",
+    status: "inactive"
+  }
+];
+
+// 관리자 권한 레벨
+export const adminRoles = [
+  {
+    id: "super_admin",
+    label: "최고 관리자",
+    description: "모든 기능에 대한 전체 권한",
+    permissions: ["all"]
+  },
+  {
+    id: "admin", 
+    label: "관리자",
+    description: "임직원 관리, 포인트 관리, 선물하기",
+    permissions: ["member_management", "point_management", "gift_management", "usage_view"]
+  },
+  {
+    id: "manager",
+    label: "매니저", 
+    description: "임직원 조회, 이용현황 조회",
+    permissions: ["member_view", "usage_view"]
+  },
+  {
+    id: "viewer",
+    label: "조회자",
+    description: "데이터 조회만 가능",
+    permissions: ["usage_view"]
+  }
+];

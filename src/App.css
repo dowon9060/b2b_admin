@@ -1923,3 +1923,124 @@ body {
     justify-content: center;
   }
 }
+
+/* 사용자 관리 페이지 스타일 */
+.user-management-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+}
+
+.filter-buttons {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.role-select {
+  min-width: 120px;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-1) var(--spacing-2);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+/* 권한 뱃지 */
+.role-badge {
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-badge.super-admin {
+  background: var(--danger-100);
+  color: var(--danger-600);
+}
+
+.role-badge.admin {
+  background: var(--primary-100);
+  color: var(--primary-600);
+}
+
+.role-badge.manager {
+  background: var(--warning-100);
+  color: var(--warning-600);
+}
+
+.role-badge.viewer {
+  background: var(--gray-200);
+  color: var(--gray-600);
+}
+
+/* 권한 설명 카드 */
+.permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.permission-card {
+  border: 1px solid var(--gray-200);
+  transition: all 0.2s ease;
+}
+
+.permission-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.permission-header {
+  padding: var(--spacing-3);
+  border-bottom: 1px solid var(--gray-200);
+  background: var(--gray-50);
+}
+
+.permission-description {
+  padding: var(--spacing-3);
+  color: var(--gray-600);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+/* 사용자 관리 테이블 */
+.table .role-select {
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  background: white;
+}
+
+.table .role-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.1);
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .user-management-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-buttons {
+    justify-content: center;
+  }
+  
+  .permissions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons .btn {
+    width: 100%;
+  }
+}

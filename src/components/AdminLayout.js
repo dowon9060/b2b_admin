@@ -10,6 +10,7 @@ import SettlementDetail from "../pages/SettlementDetail";
 import UsageTable from "../pages/UsageTable";
 import Settings from "../pages/Settings";
 import DepartmentSettings from "../pages/DepartmentSettings";
+import UserManagement from "../pages/UserManagement";
 
 function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember, companyPoints, handleRecoverPoints, handleDeductCompanyPoints }) {
   const location = useLocation();
@@ -66,6 +67,7 @@ function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember,
           <Route path="/settings/departments" element={
             <DepartmentSettings departments={departments} onAddDepartment={handleAddDepartment} />
           } />
+          <Route path="/settings/users" element={<UserManagement />} />
         </Routes>
       </main>
     </div>

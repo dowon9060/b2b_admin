@@ -57,10 +57,10 @@ function Settings() {
               </div>
             </div>
             
-            <div className="card settings-card disabled">
+            <div className="card settings-card" onClick={() => navigate("/settings/users")}>
               <div className="settings-content">
-                <h4>권한 설정</h4>
-                <p>사용자 권한 관리</p>
+                <h4>사용자 관리</h4>
+                <p>관리자 계정 및 권한 관리</p>
                 <div className="settings-arrow">→</div>
               </div>
             </div>
