@@ -4,7 +4,7 @@ import { settlementData } from '../utils/mockData';
 import { formatNumber } from '../utils/pointUtils';
 import '../App.css';
 
-function PointCharge() {
+function PointCharge({ companyPoints = 0 }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('charge');
@@ -156,9 +156,14 @@ function PointCharge() {
               <span>충전 금액</span>
               <span className="amount">{selectedAmount.toLocaleString()}원</span>
             </div>
-            <div className="summary-item total">
+            <div className="summary-item">
               <span>적립 포인트</span>
-              <span className="total-points">{selectedAmount.toLocaleString()}P</span>
+              <span className="points">{selectedAmount.toLocaleString()}P</span>
+            </div>
+            <div className="summary-divider"></div>
+            <div className="summary-item total">
+              <span>충전 후 보유 포인트</span>
+              <span className="total-points">{(companyPoints + selectedAmount).toLocaleString()}P</span>
             </div>
           </div>
 
@@ -259,6 +264,16 @@ function PointCharge() {
       <div className="page-header">
         <h2>포인트</h2>
         <p>포인트를 충전하고 사용 내역을 관리할 수 있습니다</p>
+      </div>
+
+      {/* 현재 보유 포인트 */}
+      <div className="card current-points-card">
+        <div className="card-content">
+          <div className="current-points-display">
+            <div className="points-label">현재 보유 포인트</div>
+            <div className="points-value">{companyPoints.toLocaleString()}P</div>
+          </div>
+        </div>
       </div>
 
       {/* 탭 네비게이션 */}

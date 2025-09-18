@@ -1524,3 +1524,35 @@ body {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* 현재 보유 포인트 카드 스타일 */
+.current-points-card {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-600) 100%);
+  border: none;
+  color: white;
+  margin-bottom: var(--spacing-4);
+}
+
+.current-points-display {
+  text-align: center;
+  padding: var(--spacing-4) var(--spacing-2);
+}
+
+.points-label {
+  font-size: var(--font-size-sm);
+  opacity: 0.9;
+  margin-bottom: var(--spacing-2);
+  font-weight: 500;
+}
+
+.points-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+@media (max-width: 768px) {
+  .points-value {
+    font-size: 2rem;
+  }
+}
