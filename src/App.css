@@ -1611,3 +1611,24 @@ body {
   flex-shrink: 0;
   padding: 0 var(--spacing-1);
 }
+
+/* 이용현황 테이블 전용 정렬 스타일 */
+.usage-table th:nth-child(1),
+.usage-table td:nth-child(1) {
+  text-align: left; /* 구성원 - 왼쪽 정렬 */
+}
+
+.usage-table th:nth-child(2),
+.usage-table td:nth-child(2) {
+  text-align: left; /* 부서 - 왼쪽 정렬 */
+}
+
+.usage-table th:nth-child(3),
+.usage-table td:nth-child(3) {
+  text-align: center; /* 이용기간 - 중앙 정렬 */
+}
+
+.usage-table th:nth-child(4),
+.usage-table td:nth-child(4) {
+  text-align: right; /* 포인트 - 오른쪽 정렬 */
+}

@@ -178,7 +178,7 @@ function UsageTable() {
             <h3>이용 내역</h3>
           </div>
           <div className="card-content">
-            <table className="table">
+            <table className="table usage-table">
               <thead>
                 <tr>
                   <th>구성원</th>
