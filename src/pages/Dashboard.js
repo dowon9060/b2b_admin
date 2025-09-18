@@ -74,7 +74,7 @@ function Dashboard({ members = [] }) {
 
       <div className="stats-grid">
         <div className="card stat-card">
-          <div className="stat-label">총 구성원</div>
+          <div className="stat-label">총 임직원</div>
           <div className="stat-value">
             {dashboardData.totalMembers.toLocaleString()}명
             {dashboardData.pendingInvites > 0 && (
@@ -123,7 +123,15 @@ function Dashboard({ members = [] }) {
               </div>
               <div className="activity-item">
                 <span className="activity-time">08:45</span>
-                <span className="activity-text">3월 정산이 완료되었습니다.</span>
+                <span className="activity-text">홍길동님이 100,000P를 충전했습니다.</span>
+              </div>
+              <div className="activity-item">
+                <span className="activity-time">08:20</span>
+                <span className="activity-text">마케팅부에 생일 선물이 전송되었습니다.</span>
+              </div>
+              <div className="activity-item">
+                <span className="activity-time">07:55</span>
+                <span className="activity-text">이영희님이 200,000P를 충전했습니다.</span>
               </div>
             </div>
           </div>

@@ -35,7 +35,7 @@ function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember 
               <Link to="/">홈</Link>
             </li>
             <li className={location.pathname.startsWith("/members") ? "active" : ""}>
-              <Link to="/members">구성원관리</Link>
+              <Link to="/members">임직원관리</Link>
             </li>
             <li className={location.pathname.startsWith("/charge") ? "active" : ""}>
               <Link to="/charge">포인트</Link>

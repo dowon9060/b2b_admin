@@ -80,7 +80,7 @@ function MemberList({ members, setMembers }) {
   // 일괄 포인트 지급 팝업 열기
   const handleBulkPoint = () => {
     if (selected.length === 0) {
-      alert("선택된 구성원이 없습니다.");
+      alert("선택된 임직원이 없습니다.");
       return;
     }
     setShowBulkModal(true);
@@ -202,7 +202,7 @@ function MemberList({ members, setMembers }) {
       userId: ""
     });
 
-    alert("새 구성원이 등록되었습니다!");
+    alert("새 임직원이 등록되었습니다!");
   };
 
   // 구성원 행 클릭 시 상세페이지로 이동
@@ -273,7 +273,7 @@ function MemberList({ members, setMembers }) {
       setSelectedFile(null);
       setUploadProgress(0);
       
-      alert(`${newMembers.length}명의 구성원이 성공적으로 등록되었습니다!`);
+      alert(`${newMembers.length}명의 임직원이 성공적으로 등록되었습니다!`);
       
     } catch (error) {
       alert('파일 업로드 중 오류가 발생했습니다.');
@@ -290,7 +290,7 @@ function MemberList({ members, setMembers }) {
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", "구성원_업로드_템플릿.csv");
+    link.setAttribute("download", "임직원_업로드_템플릿.csv");
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -335,7 +335,7 @@ function MemberList({ members, setMembers }) {
             엑셀 일괄 업로드
           </button>
           <button className="btn btn-primary" onClick={handleAddMember}>
-            구성원 등록
+            임직원 등록
           </button>
           <button className="btn btn-success" onClick={handleBulkPoint}>
             포인트 일괄 지급
@@ -451,7 +451,7 @@ function MemberList({ members, setMembers }) {
             
             <div className="card-content">
               <div className="card info-card">
-                <span>선택된 구성원: <strong>{selected.length}명</strong></span>
+                <span>선택된 임직원: <strong>{selected.length}명</strong></span>
               </div>
 
               <div className="card">
@@ -531,7 +531,7 @@ function MemberList({ members, setMembers }) {
 
               <div className="card summary-card">
                 <div className="summary-item">
-                  <span>선택된 구성원:</span>
+                  <span>선택된 임직원:</span>
                   <span>{selected.length}명</span>
                 </div>
                 <div className="summary-item">
@@ -560,7 +560,7 @@ function MemberList({ members, setMembers }) {
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="card modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="card-header">
-              <h3>새 구성원 등록</h3>
+              <h3>새 임직원 등록</h3>
               <button className="btn btn-secondary" onClick={() => setShowAddModal(false)}>×</button>
             </div>
             
@@ -573,7 +573,7 @@ function MemberList({ members, setMembers }) {
                       type="text"
                       value={newMemberData.name}
                       onChange={(e) => handleNewMemberChange('name', e.target.value)}
-                      placeholder="구성원 이름을 입력하세요"
+                      placeholder="임직원 이름을 입력하세요"
                       className="form-input"
                     />
                   </div>

@@ -191,7 +191,7 @@ function PointCharge() {
           <div className="stat-value">{formatNumber(416667)}P</div>
         </div>
         <div className="card stat-card">
-          <div className="stat-label">총 구성원</div>
+          <div className="stat-label">총 임직원</div>
           <div className="stat-value">48명</div>
         </div>
       </div>
@@ -206,7 +206,7 @@ function PointCharge() {
               <tr>
                 <th>정산월</th>
                 <th>총 사용량</th>
-                <th>이용 구성원</th>
+                    <th>이용 임직원</th>
                 <th>평균 사용량</th>
                 <th>상태</th>
                 <th>상세보기</th>
