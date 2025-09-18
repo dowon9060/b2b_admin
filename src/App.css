@@ -1217,3 +1217,20 @@ body {
   height: fit-content;
   min-height: 380px;
 }
+
+/* 클릭 가능한 카드 스타일 */
+.clickable-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clickable-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.clickable-card:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-md);
+}

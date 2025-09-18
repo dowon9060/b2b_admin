@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../App.css';
 
 function Dashboard({ members = [] }) {
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState({
     totalMembers: 0,
     totalPoints: 0,
@@ -32,6 +34,14 @@ function Dashboard({ members = [] }) {
     if (dashboardData.pendingInvites > 0) {
       setShowInviteModal(true);
     }
+  };
+
+  const handlePointsCardClick = () => {
+    navigate('/charge');
+  };
+
+  const handleUsageCardClick = () => {
+    navigate('/usage');
   };
 
   const handleResendInvite = async (member) => {
@@ -95,12 +105,12 @@ function Dashboard({ members = [] }) {
           </div>
         </div>
 
-        <div className="card stat-card">
+        <div className="card stat-card clickable-card" onClick={handlePointsCardClick}>
           <div className="stat-label">보유 포인트</div>
           <div className="stat-value">{dashboardData.totalPoints.toLocaleString()}P</div>
         </div>
 
-        <div className="card stat-card">
+        <div className="card stat-card clickable-card" onClick={handleUsageCardClick}>
           <div className="stat-label">이번 달 사용</div>
           <div className="stat-value">{dashboardData.monthlyUsage.toLocaleString()}P</div>
         </div>
