@@ -40,6 +40,35 @@ function MemberList({ members, setMembers }) {
     setSelected(checked ? filtered.map(m => m.id) : []);
   };
 
+  // 부서별 선택
+  const handleSelectDepartment = (department, checked) => {
+    const departmentMembers = groupedByDepartment[department] || [];
+    const departmentMemberIds = departmentMembers.map(m => m.id);
+    
+    if (checked) {
+      // 부서 전체 선택 - 기존 선택된 것들과 합치기
+      setSelected(prev => [...new Set([...prev, ...departmentMemberIds])]);
+    } else {
+      // 부서 전체 해제 - 해당 부서 구성원들만 제거
+      setSelected(prev => prev.filter(id => !departmentMemberIds.includes(id)));
+    }
+  };
+
+  // 부서별 체크박스 상태 확인
+  const getDepartmentCheckState = (department) => {
+    const departmentMembers = groupedByDepartment[department] || [];
+    const departmentMemberIds = departmentMembers.map(m => m.id);
+    const selectedInDept = departmentMemberIds.filter(id => selected.includes(id));
+    
+    if (selectedInDept.length === 0) {
+      return 'none'; // 선택 안됨
+    } else if (selectedInDept.length === departmentMemberIds.length) {
+      return 'all'; // 전체 선택됨
+    } else {
+      return 'partial'; // 일부 선택됨
+    }
+  };
+
   // 부서 접기/펼치기
   const toggleDepartment = (department) => {
     setCollapsedDepts(prev => ({
@@ -386,14 +415,29 @@ function MemberList({ members, setMembers }) {
               const isCollapsed = collapsedDepts[department];
               return (
                 <div key={department} className="card department-card">
-                  <div 
-                    className="card-header department-header" 
-                    onClick={() => toggleDepartment(department)}
-                  >
-                    <div className="department-info">
-                      <span className={`toggle-icon ${isCollapsed ? 'collapsed' : ''}`}>▼</span>
-                      <span className="department-title">{department}</span>
-                      <span className="department-count">({members.length}명)</span>
+                  <div className="card-header department-header">
+                    <div className="department-checkbox-container">
+                      <div className="department-checkbox" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={getDepartmentCheckState(department) === 'all'}
+                          ref={(input) => {
+                            if (input) {
+                              input.indeterminate = getDepartmentCheckState(department) === 'partial';
+                            }
+                          }}
+                          onChange={(e) => handleSelectDepartment(department, e.target.checked)}
+                          className="department-checkbox-input"
+                        />
+                      </div>
+                      <div 
+                        className="department-info" 
+                        onClick={() => toggleDepartment(department)}
+                      >
+                        <span className={`toggle-icon ${isCollapsed ? 'collapsed' : ''}`}>▼</span>
+                        <span className="department-title">{department}</span>
+                        <span className="department-count">({members.length}명)</span>
+                      </div>
                     </div>
                     <div className="department-total-points">
                       {members.reduce((sum, m) => sum + m.point, 0).toLocaleString()}P

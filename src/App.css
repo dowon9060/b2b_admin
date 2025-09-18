@@ -1343,3 +1343,111 @@ body {
   color: var(--gray-800);
   font-weight: 500;
 }
+
+/* 테이블 컬럼별 정렬 스타일 */
+.table td:nth-child(1) {
+  text-align: left; /* 결제일 - 왼쪽 정렬 */
+}
+
+.table td:nth-child(2) {
+  text-align: right; /* 사용 포인트 - 오른쪽 정렬 */
+}
+
+.table th:nth-child(2) {
+  text-align: right; /* 사용 포인트 헤더도 오른쪽 정렬 */
+}
+
+.table th:nth-child(3) {
+  text-align: center; /* 이용권 정보 헤더 가운데 정렬 */
+}
+
+/* 부서별 체크박스 스타일 */
+.department-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.department-checkbox {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-1);
+  cursor: pointer;
+}
+
+.department-checkbox-input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+.department-checkbox-input:indeterminate {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.department-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.department-header:hover {
+  background-color: var(--gray-50);
+}
+
+.department-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex: 1;
+}
+
+/* 초대 상태 스타일 */
+.invite-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-1);
+}
+
+.invite-header label {
+  margin: 0;
+}
+
+.invite-status {
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  display: inline-block;
+  margin-right: var(--spacing-2);
+}
+
+.invite-status-success {
+  background-color: var(--success-100);
+  color: var(--success-600);
+  border: 1px solid var(--success-200);
+}
+
+.invite-status-pending {
+  background-color: var(--warning-100);
+  color: var(--warning-600);
+  border: 1px solid var(--warning-200);
+}
+
+.invite-status-failed {
+  background-color: var(--danger-100);
+  color: var(--danger-600);
+  border: 1px solid var(--danger-200);
+}
+
+.invite-date {
+  font-size: var(--font-size-xs);
+  color: var(--gray-500);
+  font-style: italic;
+}

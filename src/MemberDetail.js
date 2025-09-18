@@ -9,6 +9,7 @@ function MemberDetail({ members, setMembers }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
   const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [isResendingInvite, setIsResendingInvite] = useState(false);
 
   useEffect(() => {
     const foundMember = members.find(m => m.id === parseInt(id));
@@ -69,6 +70,46 @@ function MemberDetail({ members, setMembers }) {
       alert('비밀번호 초기화 중 오류가 발생했습니다. 다시 시도해 주세요.');
     } finally {
       setIsResettingPassword(false);
+    }
+  };
+
+  const handleResendInvite = async () => {
+    setIsResendingInvite(true);
+    
+    try {
+      // 실제 앱에서는 초대메일 재발송 API 호출
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 시뮬레이션
+      
+      // 초대 상태를 pending으로 업데이트 (재발송됨)
+      const updatedMember = { ...member, inviteStatus: 'pending', inviteDate: new Date().toISOString().split('T')[0] };
+      setMembers(members.map(m => m.id === member.id ? updatedMember : m));
+      setMember(updatedMember);
+      
+      alert(`${member.name} (${member.email})님께 초대 이메일이 재발송되었습니다!`);
+    } catch (error) {
+      alert('초대 이메일 재발송 중 오류가 발생했습니다. 다시 시도해 주세요.');
+    } finally {
+      setIsResendingInvite(false);
+    }
+  };
+
+  // 초대 상태 표시 텍스트
+  const getInviteStatusText = (status) => {
+    switch (status) {
+      case 'accepted': return '완료';
+      case 'pending': return 'X';
+      case 'rejected': return 'X';
+      default: return 'X';
+    }
+  };
+
+  // 초대 상태 표시 클래스
+  const getInviteStatusClass = (status) => {
+    switch (status) {
+      case 'accepted': return 'invite-status-success';
+      case 'pending': return 'invite-status-pending';
+      case 'rejected': return 'invite-status-failed';
+      default: return 'invite-status-failed';
     }
   };
 
@@ -260,6 +301,31 @@ function MemberDetail({ members, setMembers }) {
                 {member.email || '정보 없음'}
               </div>
             )}
+          </div>
+
+          <div className="form-group">
+            <div className="invite-header">
+              <label>초대</label>
+              {!isEditing && member.inviteStatus !== 'accepted' && (
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={handleResendInvite}
+                  disabled={isResendingInvite}
+                >
+                  {isResendingInvite ? '재발송 중...' : '다시초대하기'}
+                </button>
+              )}
+            </div>
+            <div className="form-control-static">
+              <span className={`invite-status ${getInviteStatusClass(member.inviteStatus)}`}>
+                {getInviteStatusText(member.inviteStatus)}
+              </span>
+              {member.inviteStatus === 'pending' && member.inviteDate && (
+                <span className="invite-date">
+                  {new Date(member.inviteDate).toLocaleDateString()} 발송
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

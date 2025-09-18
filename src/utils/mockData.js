@@ -49,7 +49,7 @@ export const initialMembers = [
     phone: "010-4567-8901", 
     email: "park@company.com", 
     userId: "park@company.com",
-    inviteStatus: "pending", // 초대 대기중
+    inviteStatus: "rejected", // 초대 거절됨 (X 상태)
     inviteDate: "2024-12-05"
   },
   { 
