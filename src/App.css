@@ -1234,3 +1234,65 @@ body {
   transform: translateY(0);
   box-shadow: var(--shadow-md);
 }
+
+/* 임직원 등록 폼 개선 */
+.add-member-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.add-member-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+}
+
+.add-member-form .form-row.single-column {
+  grid-template-columns: 1fr;
+}
+
+.add-member-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.add-member-form .form-group label {
+  font-weight: 600;
+  color: var(--gray-700);
+  font-size: var(--font-size-sm);
+}
+
+.add-member-form .form-input,
+.add-member-form .form-select {
+  padding: var(--spacing-3);
+  border: 2px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.add-member-form .form-input:focus,
+.add-member-form .form-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.add-member-form .form-input::placeholder {
+  color: var(--gray-400);
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .add-member-form .form-row {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-3);
+  }
+  
+  .add-member-form {
+    max-width: 100%;
+  }
+}

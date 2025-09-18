@@ -141,21 +141,14 @@ function MemberList({ members, setMembers }) {
     setShowAddModal(true);
   };
 
-  // 새 구성원 데이터 변경
+  // 새 임직원 데이터 변경
   const handleNewMemberChange = (field, value) => {
-    // 이메일 변경 시 아이디도 자동으로 설정
-    if (field === 'email') {
-      setNewMemberData({
-        ...newMemberData,
-        [field]: value,
-        userId: value  // 이메일과 아이디 동일하게 설정
-      });
-    } else {
-      setNewMemberData({
-        ...newMemberData,
-        [field]: value
-      });
-    }
+    setNewMemberData({
+      ...newMemberData,
+      [field]: value,
+      // 이메일 변경 시 userId도 동일하게 설정 (서버에서 사용)
+      ...(field === 'email' && { userId: value })
+    });
   };
 
   // 새 구성원 저장
@@ -285,7 +278,7 @@ function MemberList({ members, setMembers }) {
   // 엑셀 템플릿 다운로드
   const handleDownloadTemplate = () => {
     // 실제로는 서버에서 템플릿 파일을 다운로드
-    const csvContent = "이름,부서,사원번호,입사일,연락처,이메일,아이디,초기포인트\n홍길동,영업,1001,2024-01-01,010-1234-5678,hong@company.com,hong@company.com,1000";
+    const csvContent = "이름,부서,사원번호,입사일,연락처,이메일,초기포인트\n홍길동,영업,1001,2024-01-01,010-1234-5678,hong@company.com,1000";
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
@@ -639,17 +632,7 @@ function MemberList({ members, setMembers }) {
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>아이디 (로그인 ID)</label>
-                    <input
-                      type="text"
-                      value={newMemberData.userId}
-                      onChange={(e) => handleNewMemberChange('userId', e.target.value)}
-                      placeholder="이메일과 동일하게 설정됩니다"
-                      className="form-input"
-                    />
-                  </div>
+                <div className="form-row single-column">
                   <div className="form-group">
                     <label>초기 포인트</label>
                     <input
@@ -689,7 +672,7 @@ function MemberList({ members, setMembers }) {
                   <li>엑셀 파일(.xlsx, .xls) 또는 CSV 파일(.csv)을 업로드할 수 있습니다.</li>
                   <li>첫 번째 행은 헤더로 인식되어 제외됩니다.</li>
                   <li>필수 컬럼: 이름, 부서, 사원번호, 입사일</li>
-                  <li>선택 컬럼: 연락처, 이메일, 아이디, 초기포인트</li>
+                  <li>선택 컬럼: 연락처, 이메일, 초기포인트</li>
                 </ul>
               </div>
 
