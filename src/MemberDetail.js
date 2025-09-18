@@ -306,7 +306,7 @@ function MemberDetail({ members, setMembers }) {
                 <tr>
                   <th>결제일</th>
                   <th>사용 포인트</th>
-                  <th>이용권 기간</th>
+                  <th>이용권 정보</th>
                 </tr>
               </thead>
               <tbody>
@@ -314,7 +314,10 @@ function MemberDetail({ members, setMembers }) {
                   <tr key={index}>
                     <td>{usage.usageDate}</td>
                     <td>{usage.points.toLocaleString()}P</td>
-                    <td>{getUsagePeriod(usage.usageDate, usage.points)}</td>
+                    <td className="usage-period-cell">
+                      <div className="usage-period-label">이용권 기간</div>
+                      <div className="usage-period-date">{getUsagePeriod(usage.usageDate, usage.points)}</div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

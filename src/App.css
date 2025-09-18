@@ -1333,3 +1333,26 @@ body {
   cursor: not-allowed;
   opacity: 0.7;
 }
+
+/* 이용권 기간 셀 스타일 */
+.usage-period-cell {
+  text-align: center;
+  vertical-align: middle;
+  padding: var(--spacing-3);
+}
+
+.usage-period-label {
+  font-size: var(--font-size-xs);
+  color: var(--gray-600);
+  font-weight: 500;
+  margin-bottom: var(--spacing-1);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.usage-period-date {
+  font-size: var(--font-size-sm);
+  color: var(--gray-800);
+  font-weight: 600;
+  line-height: 1.2;
+}
