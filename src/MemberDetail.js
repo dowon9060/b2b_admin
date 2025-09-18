@@ -275,56 +275,58 @@ function MemberDetail({ members, setMembers }) {
             </div>
           </div>
           
-          <div className="form-group">
-            <div className="email-header">
-              <label>이메일(아이디)</label>
-              {!isEditing && (
-                <button
-                  className="btn btn-warning btn-sm"
-                  onClick={handlePasswordReset}
-                  disabled={isResettingPassword}
-                >
-                  {isResettingPassword ? '초기화 중...' : '비밀번호 초기화'}
-                </button>
-              )}
-            </div>
-            {isEditing ? (
-              <input
-                type="email"
-                className="form-control"
-                value={editData.email || ''}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="example@company.com"
-              />
-            ) : (
-              <div className="form-control-static">
-                {member.email || '정보 없음'}
+          <div className="form-row">
+            <div className="form-group">
+              <div className="email-header">
+                <label>이메일(아이디)</label>
+                {!isEditing && (
+                  <button
+                    className="btn btn-warning btn-sm"
+                    onClick={handlePasswordReset}
+                    disabled={isResettingPassword}
+                  >
+                    {isResettingPassword ? '초기화 중...' : '비밀번호 초기화'}
+                  </button>
+                )}
               </div>
-            )}
-          </div>
-
-          <div className="form-group">
-            <div className="invite-header">
-              <label>초대</label>
-              {!isEditing && member.inviteStatus !== 'accepted' && (
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={handleResendInvite}
-                  disabled={isResendingInvite}
-                >
-                  {isResendingInvite ? '재발송 중...' : '다시초대하기'}
-                </button>
+              {isEditing ? (
+                <input
+                  type="email"
+                  className="form-control"
+                  value={editData.email || ''}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  placeholder="example@company.com"
+                />
+              ) : (
+                <div className="form-control-static">
+                  {member.email || '정보 없음'}
+                </div>
               )}
             </div>
-            <div className="form-control-static">
-              <span className={`invite-status ${getInviteStatusClass(member.inviteStatus)}`}>
-                {getInviteStatusText(member.inviteStatus)}
-              </span>
-              {member.inviteStatus === 'pending' && member.inviteDate && (
-                <span className="invite-date">
-                  {new Date(member.inviteDate).toLocaleDateString()} 발송
+
+            <div className="form-group">
+              <div className="invite-header">
+                <label>초대</label>
+                {!isEditing && member.inviteStatus !== 'accepted' && (
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={handleResendInvite}
+                    disabled={isResendingInvite}
+                  >
+                    {isResendingInvite ? '재발송 중...' : '다시초대하기'}
+                  </button>
+                )}
+              </div>
+              <div className="form-control-static">
+                <span className={`invite-status ${getInviteStatusClass(member.inviteStatus)}`}>
+                  {getInviteStatusText(member.inviteStatus)}
                 </span>
-              )}
+                {member.inviteStatus === 'pending' && member.inviteDate && (
+                  <span className="invite-date">
+                    {new Date(member.inviteDate).toLocaleDateString()} 발송
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
