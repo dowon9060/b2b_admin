@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "./hooks/useToast";
+import Toast from "./components/Toast";
 
 const departments = ["전체", "영업", "개발", "디자인"];
 
@@ -10,6 +12,7 @@ function MemberList({ members, setMembers }) {
   const [viewMode, setViewMode] = useState("list"); // "list" 또는 "department"
   const [collapsedDepts, setCollapsedDepts] = useState({}); // 접힌 부서들
   const navigate = useNavigate();
+  const { toasts, removeToast, success, error, warning, info } = useToast();
 
   // 필터링
   const filtered = members.filter(
@@ -109,17 +112,26 @@ function MemberList({ members, setMembers }) {
   // 일괄 포인트 지급 팝업 열기
   const handleBulkPoint = () => {
     if (selected.length === 0) {
-      alert("선택된 임직원이 없습니다.");
+      warning("선택된 임직원이 없습니다.");
       return;
     }
     setShowBulkModal(true);
   };
 
-  // 포인트 금액 선택
+  // 포인트 금액 선택 (누적 방식)
   const handlePointAmountSelect = (amount) => {
     setBulkPointData({
       ...bulkPointData,
-      pointAmount: amount,
+      pointAmount: (bulkPointData.pointAmount || 0) + amount,
+      customAmount: ""
+    });
+  };
+
+  // 포인트 금액 초기화
+  const handleResetPointAmount = () => {
+    setBulkPointData({
+      ...bulkPointData,
+      pointAmount: 0,
       customAmount: ""
     });
   };
@@ -137,11 +149,11 @@ function MemberList({ members, setMembers }) {
   const handleFinalIssue = () => {
     const amount = bulkPointData.pointAmount || Number(bulkPointData.customAmount);
     if (!amount || amount < 1000) {
-      alert("최소 1,000포인트 이상 입력해주세요.");
+      warning("최소 1,000포인트 이상 입력해주세요.");
       return;
     }
     if (!bulkPointData.startDate || !bulkPointData.endDate) {
-      alert("시작일과 종료일을 설정해주세요.");
+      warning("시작일과 종료일을 설정해주세요.");
       return;
     }
 
@@ -162,7 +174,7 @@ function MemberList({ members, setMembers }) {
     });
     setSelected([]);
     
-    alert(`${selected.length}명에게 ${amount.toLocaleString()}포인트가 지급되었습니다.`);
+    success(`${selected.length}명에게 ${amount.toLocaleString()}포인트가 지급되었습니다.`);
   };
 
   // 구성원 등록 모달 열기
@@ -367,43 +379,53 @@ function MemberList({ members, setMembers }) {
 
       {/* 이름으로 보기 - 기존 테이블 */}
       {viewMode === "list" && (
-        <div className="card">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    checked={selected.length === filtered.length && filtered.length > 0}
-                    onChange={e => handleSelectAll(e.target.checked)}
-                  />
-                </th>
-                <th>이름</th>
-                <th>부서</th>
-                <th>사원번호</th>
-                <th>포인트</th>
-                <th>입사일</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(m => (
-                <tr key={m.id} onClick={() => handleRowClick(m.id)} style={{ cursor: "pointer" }}>
-                  <td onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(m.id)}
-                      onChange={() => handleSelect(m.id)}
-                    />
-                  </td>
-                  <td>{m.name}</td>
-                  <td>{m.department}</td>
-                  <td>{m.empNo}</td>
-                  <td>{m.point.toLocaleString()}P</td>
-                  <td>{m.joinDate}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="member-table-container">
+          <div className="card">
+            {filtered.length > 0 ? (
+              <table className="table member-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <input
+                        type="checkbox"
+                        checked={selected.length === filtered.length && filtered.length > 0}
+                        onChange={e => handleSelectAll(e.target.checked)}
+                      />
+                    </th>
+                    <th>임직원명</th>
+                    <th>소속부서</th>
+                    <th>사원번호</th>
+                    <th>보유포인트</th>
+                    <th>입사일자</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map(m => (
+                    <tr key={m.id} onClick={() => handleRowClick(m.id)} style={{ cursor: "pointer" }}>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={selected.includes(m.id)}
+                          onChange={() => handleSelect(m.id)}
+                        />
+                      </td>
+                      <td>{m.name}</td>
+                      <td>{m.department}</td>
+                      <td>{m.empNo}</td>
+                      <td>{m.point.toLocaleString()}P</td>
+                      <td>{m.joinDate || '미설정'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="empty-members-state">
+                <div className="empty-icon">👥</div>
+                <h3>등록된 임직원이 없습니다</h3>
+                <p>새로운 임직원을 등록하거나 검색 조건을 변경해 보세요.</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -480,7 +502,7 @@ function MemberList({ members, setMembers }) {
       {/* 포인트 일괄지급 모달 */}
       {showBulkModal && (
         <div className="modal-overlay" onClick={() => setShowBulkModal(false)}>
-          <div className="card modal-card" onClick={(e) => e.stopPropagation()}>
+          <div className="card modal-card bulk-point-modal" onClick={(e) => e.stopPropagation()}>
             <div className="card-header">
               <h3>포인트 일괄 지급</h3>
               <button className="btn btn-secondary" onClick={() => setShowBulkModal(false)}>×</button>
@@ -531,25 +553,57 @@ function MemberList({ members, setMembers }) {
 
               <div className="card">
                 <h4>포인트 선택</h4>
-                <div className="button-group">
-                  <button
-                    className={`btn ${bulkPointData.pointAmount === 100000 ? 'btn-primary' : 'btn-secondary'}`}
-                    onClick={() => handlePointAmountSelect(100000)}
-                  >
-                    10만
-                  </button>
-                  <button
-                    className={`btn ${bulkPointData.pointAmount === 200000 ? 'btn-primary' : 'btn-secondary'}`}
-                    onClick={() => handlePointAmountSelect(200000)}
-                  >
-                    20만
-                  </button>
-                  <button
-                    className={`btn ${bulkPointData.pointAmount === 300000 ? 'btn-primary' : 'btn-secondary'}`}
-                    onClick={() => handlePointAmountSelect(300000)}
-                  >
-                    30만
-                  </button>
+                <div className="point-amount-controls">
+                  <div className="button-group">
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => handlePointAmountSelect(10000)}
+                    >
+                      +1만
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => handlePointAmountSelect(30000)}
+                    >
+                      +3만
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => handlePointAmountSelect(50000)}
+                    >
+                      +5만
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => handlePointAmountSelect(100000)}
+                    >
+                      +10만
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => handlePointAmountSelect(200000)}
+                    >
+                      +20만
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => handlePointAmountSelect(300000)}
+                    >
+                      +30만
+                    </button>
+                  </div>
+                  <div className="amount-controls">
+                    <div className="current-amount">
+                      현재 선택된 금액: <span className="amount-value">{(bulkPointData.pointAmount || 0).toLocaleString()}P</span>
+                    </div>
+                    <button 
+                      className="btn btn-outline"
+                      onClick={handleResetPointAmount}
+                      disabled={!bulkPointData.pointAmount}
+                    >
+                      🔄 초기화
+                    </button>
+                  </div>
                 </div>
                 
                 <div className="form-group">
@@ -563,6 +617,51 @@ function MemberList({ members, setMembers }) {
                     className="form-control"
                   />
                   <span>포인트</span>
+                </div>
+              </div>
+
+              {/* 선택된 구성원 목록 */}
+              <div className="card">
+                <div className="card-header">
+                  <h4>선택된 구성원 ({selected.length}명)</h4>
+                </div>
+                <div className="card-content">
+                  {selected.length > 0 ? (
+                    <div className={`selected-members-list ${selected.length > 10 ? 'scrollable' : ''}`}>
+                      {selected.map(memberId => {
+                        const member = members.find(m => m.id === memberId);
+                        return member ? (
+                          <div key={member.id} className="selected-member-item">
+                            <div className="member-info">
+                              <div className="member-name">{member.name}</div>
+                              <div className="member-details">
+                                <div className="member-detail-row">
+                                  <span className="member-dept">{member.department}</span>
+                                  <span className="member-empno">사번: {member.empNo}</span>
+                                </div>
+                                <div className="member-detail-row">
+                                  <span style={{ color: 'var(--gray-600)', fontSize: 'var(--font-size-sm)' }}>보유 포인트</span>
+                                  <span className="member-points">{member.point.toLocaleString()}P</span>
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              className="btn btn-sm btn-outline"
+                              onClick={() => setSelected(prev => prev.filter(id => id !== memberId))}
+                              title="선택 해제"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <div className="empty-state-icon">👥</div>
+                      <p>선택된 구성원이 없습니다</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -782,6 +881,20 @@ function MemberList({ members, setMembers }) {
           </div>
         </div>
       )}
+
+      {/* 토스트 알림 */}
+      <div className="toast-container">
+        {toasts.map(toast => (
+          <Toast
+            key={toast.id}
+            type={toast.type}
+            title={toast.title}
+            message={toast.message}
+            onClose={() => removeToast(toast.id)}
+            duration={toast.duration}
+          />
+        ))}
+      </div>
     </div>
   );
 }
