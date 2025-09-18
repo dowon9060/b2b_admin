@@ -1165,3 +1165,55 @@ body {
 .table td:last-child {
   text-align: center;
 }
+
+/* 스크롤 가능한 콘텐츠 */
+.scrollable-content {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: var(--spacing-2);
+}
+
+/* 스크롤바가 있을 때의 여백 조정 */
+.scrollable-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: var(--radius-sm);
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+/* 스크롤 영역 내 요소들 간격 조정 */
+.scrollable-content .activity-item {
+  margin-bottom: var(--spacing-3);
+  padding-bottom: var(--spacing-3);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.scrollable-content .activity-item:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.scrollable-content .usage-bar {
+  margin-bottom: var(--spacing-4);
+}
+
+.scrollable-content .usage-bar:last-child {
+  margin-bottom: 0;
+}
+
+/* 대시보드 그리드 내 카드 높이 통일 */
+.dashboard-grid .card {
+  height: fit-content;
+  min-height: 380px;
+}

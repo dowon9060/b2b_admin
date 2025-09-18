@@ -112,7 +112,7 @@ function Dashboard({ members = [] }) {
             <h3>최근 활동</h3>
           </div>
           <div className="card-content">
-            <div className="activity-list">
+            <div className="activity-list scrollable-content">
               <div className="activity-item">
                 <span className="activity-time">10:30</span>
                 <span className="activity-text">김영희님이 포인트 충전을 완료했습니다.</span>
@@ -133,6 +133,34 @@ function Dashboard({ members = [] }) {
                 <span className="activity-time">07:55</span>
                 <span className="activity-text">이영희님이 200,000P를 충전했습니다.</span>
               </div>
+              <div className="activity-item">
+                <span className="activity-time">07:30</span>
+                <span className="activity-text">박민수님이 50,000P를 충전했습니다.</span>
+              </div>
+              <div className="activity-item">
+                <span className="activity-time">07:10</span>
+                <span className="activity-text">인사부에 환영 선물이 전송되었습니다.</span>
+              </div>
+              <div className="activity-item">
+                <span className="activity-time">06:45</span>
+                <span className="activity-text">최유리님이 300,000P를 충전했습니다.</span>
+              </div>
+              <div className="activity-item">
+                <span className="activity-time">06:20</span>
+                <span className="activity-text">영업부에 인센티브 선물이 전송되었습니다.</span>
+              </div>
+              <div className="activity-item">
+                <span className="activity-time">06:00</span>
+                <span className="activity-text">정수현님이 150,000P를 충전했습니다.</span>
+              </div>
+              <div className="activity-item">
+                <span className="activity-time">05:40</span>
+                <span className="activity-text">개발부에 야근 선물이 전송되었습니다.</span>
+              </div>
+              <div className="activity-item">
+                <span className="activity-time">05:15</span>
+                <span className="activity-text">김철수님이 80,000P를 충전했습니다.</span>
+              </div>
             </div>
           </div>
         </div>
@@ -142,7 +170,7 @@ function Dashboard({ members = [] }) {
             <h3>부서별 포인트 사용량</h3>
           </div>
           <div className="card-content">
-            <div className="department-usage">
+            <div className="department-usage scrollable-content">
               <div className="usage-bar">
                 <span className="department-name">영업부</span>
                 <div className="progress-bar">
@@ -163,6 +191,48 @@ function Dashboard({ members = [] }) {
                   <div className="progress-fill" style={{width: '40%'}}></div>
                 </div>
                 <span className="usage-amount">240,000P</span>
+              </div>
+              <div className="usage-bar">
+                <span className="department-name">인사부</span>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{width: '55%'}}></div>
+                </div>
+                <span className="usage-amount">330,000P</span>
+              </div>
+              <div className="usage-bar">
+                <span className="department-name">기획부</span>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{width: '35%'}}></div>
+                </div>
+                <span className="usage-amount">210,000P</span>
+              </div>
+              <div className="usage-bar">
+                <span className="department-name">디자인부</span>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{width: '50%'}}></div>
+                </div>
+                <span className="usage-amount">300,000P</span>
+              </div>
+              <div className="usage-bar">
+                <span className="department-name">재무부</span>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{width: '30%'}}></div>
+                </div>
+                <span className="usage-amount">180,000P</span>
+              </div>
+              <div className="usage-bar">
+                <span className="department-name">법무부</span>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{width: '25%'}}></div>
+                </div>
+                <span className="usage-amount">150,000P</span>
+              </div>
+              <div className="usage-bar">
+                <span className="department-name">운영부</span>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{width: '45%'}}></div>
+                </div>
+                <span className="usage-amount">270,000P</span>
               </div>
             </div>
           </div>
