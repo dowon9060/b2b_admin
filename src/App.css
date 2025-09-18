@@ -809,10 +809,11 @@ body {
   border-bottom: none;
 }
 
-.usage-date {
+.usage-period {
   font-weight: 600;
   color: var(--gray-900);
-  min-width: 100px;
+  min-width: 120px;
+  font-size: var(--font-size-sm);
 }
 
 .usage-info {

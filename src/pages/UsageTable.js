@@ -75,6 +75,23 @@ function UsageTable() {
     setEndDate("");
   };
 
+  // 이용권 기간 계산 함수
+  const getUsagePeriod = (usageDate, points) => {
+    const startDate = new Date(usageDate);
+    let days = 30; // 기본 30일
+
+    // 포인트에 따른 이용 기간 설정
+    if (points >= 50000) days = 90; // 3개월
+    else if (points >= 40000) days = 60; // 2개월
+    else if (points >= 30000) days = 30; // 1개월
+    else days = 7; // 1주일
+
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + days);
+
+    return `${startDate.toLocaleDateString()} ~ ${endDate.toLocaleDateString()}`;
+  };
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -166,9 +183,8 @@ function UsageTable() {
                 <tr>
                   <th>구성원</th>
                   <th>부서</th>
-                  <th>이용일</th>
+                  <th>이용기간</th>
                   <th>포인트</th>
-                  <th>금액</th>
                 </tr>
               </thead>
               <tbody>
@@ -176,9 +192,8 @@ function UsageTable() {
                   <tr key={usage.id}>
                     <td>{usage.memberName}</td>
                     <td>{usage.department}</td>
-                    <td>{usage.usageDate}</td>
+                    <td className="usage-period-cell">{getUsagePeriod(usage.usageDate, usage.points)}</td>
                     <td>{formatNumber(usage.points)}P</td>
-                    <td>{formatNumber(usage.amount)}원</td>
                   </tr>
                 ))}
               </tbody>
@@ -194,7 +209,6 @@ function UsageTable() {
             {Object.entries(groupedByDepartment).map(([department, usages]) => {
               const isCollapsed = collapsedDepts[department];
               const deptTotalPoints = usages.reduce((sum, usage) => sum + usage.points, 0);
-              const deptTotalAmount = usages.reduce((sum, usage) => sum + usage.amount, 0);
               
               return (
                 <div key={department} className="card department-card">
@@ -208,7 +222,7 @@ function UsageTable() {
                       <span className="department-count">({usages.length}건)</span>
                     </div>
                     <div className="department-total">
-                      {formatNumber(deptTotalPoints)}P ({formatNumber(deptTotalAmount)}원)
+                      {formatNumber(deptTotalPoints)}P
                     </div>
                   </div>
                   
@@ -216,12 +230,11 @@ function UsageTable() {
                     <div className="card-content">
                       {usages.map(usage => (
                         <div key={usage.id} className="card usage-card">
-                          <div className="usage-date">{usage.usageDate}</div>
+                          <div className="usage-period">{getUsagePeriod(usage.usageDate, usage.points)}</div>
                           <div className="usage-info">
                             <div className="usage-member">{usage.memberName}</div>
                             <div className="usage-details">
                               <span>포인트: {formatNumber(usage.points)}P</span>
-                              <span>금액: {formatNumber(usage.amount)}원</span>
                             </div>
                           </div>
                         </div>
