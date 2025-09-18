@@ -54,7 +54,7 @@ function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember 
       </header>
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<Dashboard members={members} />} />
           <Route path="/members" element={<MemberList members={members} setMembers={setMembers} />} />
           <Route path="/members/new" element={<MemberDetail members={members} onUpdate={handleAddMember} />} />
           <Route path="/members/:id" element={<MemberDetail members={members} onUpdate={handleUpdateMember} />} />

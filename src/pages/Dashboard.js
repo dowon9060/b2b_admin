@@ -1,23 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css';
 
-function Dashboard() {
+function Dashboard({ members = [] }) {
   const [dashboardData, setDashboardData] = useState({
     totalMembers: 0,
     totalPoints: 0,
     monthlyUsage: 0,
-    pendingSettlements: 0
+    pendingInvites: 0
   });
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [pendingMembers, setPendingMembers] = useState([]);
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
+    // 초대 미수락 회원 계산
+    const pendingInviteMembers = members.filter(member => member.inviteStatus === 'pending');
+    const acceptedMembers = members.filter(member => member.inviteStatus === 'accepted');
+    
+    setPendingMembers(pendingInviteMembers);
+    
     // 실제 앱에서는 API에서 데이터를 가져옴
     setDashboardData({
-      totalMembers: 156,
+      totalMembers: acceptedMembers.length,
       totalPoints: 2540000,
       monthlyUsage: 890000,
-      pendingSettlements: 12
+      pendingInvites: pendingInviteMembers.length
     });
-  }, []);
+  }, [members]);
+
+  const handleInviteCardClick = () => {
+    if (dashboardData.pendingInvites > 0) {
+      setShowInviteModal(true);
+    }
+  };
+
+  const handleResendInvite = async (member) => {
+    setIsResending(true);
+    
+    try {
+      // 실제 앱에서는 이메일 발송 API 호출
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 시뮬레이션
+      
+      alert(`${member.name}님에게 초대 메일이 재발송되었습니다.\n이메일: ${member.email}`);
+    } catch (error) {
+      alert('이메일 발송 중 오류가 발생했습니다. 다시 시도해 주세요.');
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const handleResendAllInvites = async () => {
+    setIsResending(true);
+    
+    try {
+      // 실제 앱에서는 일괄 이메일 발송 API 호출
+      await new Promise(resolve => setTimeout(resolve, 3000)); // 시뮬레이션
+      
+      alert(`총 ${pendingMembers.length}명에게 초대 메일이 일괄 재발송되었습니다.`);
+      setShowInviteModal(false);
+    } catch (error) {
+      alert('일괄 이메일 발송 중 오류가 발생했습니다. 다시 시도해 주세요.');
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   return (
     <div className="page-container">
@@ -29,7 +75,24 @@ function Dashboard() {
       <div className="stats-grid">
         <div className="card stat-card">
           <div className="stat-label">총 구성원</div>
-          <div className="stat-value">{dashboardData.totalMembers.toLocaleString()}명</div>
+          <div className="stat-value">
+            {dashboardData.totalMembers.toLocaleString()}명
+            {dashboardData.pendingInvites > 0 && (
+              <span 
+                className="pending-invites" 
+                onClick={handleInviteCardClick}
+                style={{ 
+                  fontSize: '0.9rem', 
+                  color: '#f56565', 
+                  marginLeft: '8px',
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                (미수락 {dashboardData.pendingInvites}명)
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="card stat-card">
@@ -40,11 +103,6 @@ function Dashboard() {
         <div className="card stat-card">
           <div className="stat-label">이번 달 사용</div>
           <div className="stat-value">{dashboardData.monthlyUsage.toLocaleString()}P</div>
-        </div>
-
-        <div className="card stat-card">
-          <div className="stat-label">정산 대기</div>
-          <div className="stat-value">{dashboardData.pendingSettlements}건</div>
         </div>
       </div>
 
@@ -102,6 +160,106 @@ function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* 초대 미수락 임직원 모달 */}
+      {showInviteModal && (
+        <div className="modal-overlay" onClick={() => setShowInviteModal(false)}>
+          <div className="card modal-card large-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="card-header">
+              <h3>초대 미수락 임직원</h3>
+              <button className="btn btn-secondary" onClick={() => setShowInviteModal(false)}>×</button>
+            </div>
+
+            <div className="card-content">
+              <div className="card info-card">
+                <p>
+                  총 <strong>{pendingMembers.length}명</strong>의 임직원이 초대를 수락하지 않았습니다.
+                  아래 목록에서 개별 또는 일괄로 초대 메일을 재발송할 수 있습니다.
+                </p>
+              </div>
+
+              <div className="card">
+                <div className="card-header">
+                  <h4>미수락 임직원 목록</h4>
+                </div>
+                <div className="card-content">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>이름</th>
+                        <th>부서</th>
+                        <th>이메일</th>
+                        <th>초대일</th>
+                        <th>대기일수</th>
+                        <th>재발송</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pendingMembers.map(member => {
+                        const daysSinceInvite = Math.floor(
+                          (new Date() - new Date(member.inviteDate)) / (1000 * 60 * 60 * 24)
+                        );
+                        
+                        return (
+                          <tr key={member.id}>
+                            <td>{member.name}</td>
+                            <td>{member.department}</td>
+                            <td>{member.email}</td>
+                            <td>{member.inviteDate}</td>
+                            <td>
+                              <span className={daysSinceInvite > 7 ? 'text-warning' : ''}>
+                                {daysSinceInvite}일
+                              </span>
+                            </td>
+                            <td>
+                              <button
+                                className="btn btn-primary btn-sm"
+                                onClick={() => handleResendInvite(member)}
+                                disabled={isResending}
+                              >
+                                {isResending ? '발송중...' : '재발송'}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {isResending && (
+                <div className="card">
+                  <div className="resending-progress">
+                    <h4>이메일 발송 중...</h4>
+                    <div className="progress-indicator">
+                      <div className="spinner"></div>
+                      <span>초대 메일을 발송하고 있습니다. 잠시만 기다려주세요.</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="card-footer">
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowInviteModal(false)}
+                disabled={isResending}
+              >
+                닫기
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleResendAllInvites}
+                disabled={isResending || pendingMembers.length === 0}
+              >
+                {isResending ? '발송 중...' : `전체 ${pendingMembers.length}명에게 일괄 재발송`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

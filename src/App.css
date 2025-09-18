@@ -1107,3 +1107,61 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--gray-400);
 }
+
+/* 대시보드 초대 관련 스타일 */
+.pending-invites:hover {
+  color: var(--danger) !important;
+  text-decoration: underline !important;
+}
+
+.text-warning {
+  color: var(--warning-700) !important;
+  font-weight: 500;
+}
+
+/* 큰 모달 */
+.large-modal {
+  max-width: 900px !important;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* 프로그레스 인디케이터 */
+.resending-progress {
+  text-align: center;
+  padding: var(--spacing-6);
+}
+
+.progress-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-4);
+}
+
+/* 스피너 애니메이션 */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--gray-200);
+  border-top: 2px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 작은 버튼 */
+.btn-sm {
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-sm);
+}
+
+/* 테이블 내 텍스트 정렬 */
+.table td:last-child {
+  text-align: center;
+}

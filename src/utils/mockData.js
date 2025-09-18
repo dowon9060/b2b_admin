@@ -9,7 +9,9 @@ export const initialMembers = [
     point: 1000, 
     phone: "010-1234-5678", 
     email: "hong@company.com", 
-    userId: "hong@company.com" 
+    userId: "hong@company.com",
+    inviteStatus: "accepted", // 초대 수락됨
+    inviteDate: "2022-01-01"
   },
   { 
     id: 2, 
@@ -20,7 +22,9 @@ export const initialMembers = [
     point: 800, 
     phone: "010-2345-6789", 
     email: "kim@company.com", 
-    userId: "kim@company.com" 
+    userId: "kim@company.com",
+    inviteStatus: "pending", // 초대 대기중
+    inviteDate: "2024-12-10"
   },
   { 
     id: 3, 
@@ -31,7 +35,48 @@ export const initialMembers = [
     point: 1200, 
     phone: "010-3456-7890", 
     email: "lee@company.com", 
-    userId: "lee@company.com" 
+    userId: "lee@company.com",
+    inviteStatus: "accepted", // 초대 수락됨
+    inviteDate: "2023-03-15"
+  },
+  { 
+    id: 4, 
+    name: "박민수", 
+    department: "영업", 
+    joinDate: null, 
+    empNo: "1004", 
+    point: 0, 
+    phone: "010-4567-8901", 
+    email: "park@company.com", 
+    userId: "park@company.com",
+    inviteStatus: "pending", // 초대 대기중
+    inviteDate: "2024-12-05"
+  },
+  { 
+    id: 5, 
+    name: "정수현", 
+    department: "개발", 
+    joinDate: null, 
+    empNo: "1005", 
+    point: 0, 
+    phone: "010-5678-9012", 
+    email: "jung@company.com", 
+    userId: "jung@company.com",
+    inviteStatus: "pending", // 초대 대기중
+    inviteDate: "2024-12-12"
+  },
+  { 
+    id: 6, 
+    name: "최유리", 
+    department: "마케팅", 
+    joinDate: "2024-11-20", 
+    empNo: "1006", 
+    point: 500, 
+    phone: "010-6789-0123", 
+    email: "choi@company.com", 
+    userId: "choi@company.com",
+    inviteStatus: "accepted", // 초대 수락됨
+    inviteDate: "2024-11-20"
   },
 ];
 
