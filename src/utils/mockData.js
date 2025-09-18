@@ -120,3 +120,154 @@ export const settlementData = [
 
 // 부서 목록
 export const departments = ["전체", "영업", "개발", "디자인"];
+
+// 선물 상품 데이터
+export const giftProducts = [
+  {
+    id: 1,
+    name: "PT 개인레슨 1회",
+    description: "전문 트레이너와 1:1 개인 레슨 (50분)",
+    points: 80000,
+    category: "PT",
+    duration: "50분",
+    validity: "3개월",
+    image: "🏋️‍♂️"
+  },
+  {
+    id: 2,
+    name: "PT 개인레슨 5회 패키지",
+    description: "전문 트레이너와 1:1 개인 레슨 5회 패키지",
+    points: 350000,
+    category: "PT",
+    duration: "50분 × 5회",
+    validity: "6개월",
+    image: "🏋️‍♀️"
+  },
+  {
+    id: 3,
+    name: "헬스장 1개월 이용권",
+    description: "헬스장 자유 이용권 (1개월)",
+    points: 50000,
+    category: "헬스",
+    duration: "무제한",
+    validity: "1개월",
+    image: "💪"
+  },
+  {
+    id: 4,
+    name: "헬스장 3개월 이용권",
+    description: "헬스장 자유 이용권 (3개월)",
+    points: 120000,
+    category: "헬스",
+    duration: "무제한",
+    validity: "3개월",
+    image: "🏃‍♂️"
+  },
+  {
+    id: 5,
+    name: "필라테스 그룹레슨 10회",
+    description: "소규모 그룹 필라테스 레슨 10회",
+    points: 200000,
+    category: "필라테스",
+    duration: "60분 × 10회",
+    validity: "3개월",
+    image: "🧘‍♀️"
+  },
+  {
+    id: 6,
+    name: "요가 그룹레슨 15회",
+    description: "요가 그룹 레슨 15회 패키지",
+    points: 180000,
+    category: "요가",
+    duration: "70분 × 15회",
+    validity: "4개월",
+    image: "🕉️"
+  },
+  {
+    id: 7,
+    name: "수영 자유 이용권 2개월",
+    description: "수영장 자유 이용권 (2개월)",
+    points: 90000,
+    category: "수영",
+    duration: "무제한",
+    validity: "2개월",
+    image: "🏊‍♂️"
+  },
+  {
+    id: 8,
+    name: "스피닝 클래스 20회",
+    description: "고강도 스피닝 클래스 20회",
+    points: 160000,
+    category: "스피닝",
+    duration: "45분 × 20회",
+    validity: "3개월",
+    image: "🚴‍♀️"
+  },
+  {
+    id: 9,
+    name: "다짐 굿즈 세트",
+    description: "다짐 브랜드 운동복 + 물병 + 수건 세트",
+    points: 45000,
+    category: "굿즈",
+    duration: "-",
+    validity: "무제한",
+    image: "🎁"
+  },
+  {
+    id: 10,
+    name: "운동 상담 + 식단 컨설팅",
+    description: "전문가 운동 상담 및 개인 맞춤 식단 컨설팅",
+    points: 70000,
+    category: "상담",
+    duration: "90분",
+    validity: "1개월",
+    image: "📋"
+  }
+];
+
+// 선물 카테고리
+export const giftCategories = [
+  { id: "all", name: "전체" },
+  { id: "PT", name: "개인레슨" },
+  { id: "헬스", name: "헬스장" },
+  { id: "필라테스", name: "필라테스" },
+  { id: "요가", name: "요가" },
+  { id: "수영", name: "수영" },
+  { id: "스피닝", name: "스피닝" },
+  { id: "굿즈", name: "굿즈" },
+  { id: "상담", name: "상담" }
+];
+
+// 선물 내역 데이터
+export const giftHistory = [
+  {
+    id: 1,
+    memberName: "홍길동",
+    memberDept: "영업",
+    productName: "PT 개인레슨 1회",
+    points: 80000,
+    giftDate: "2024-12-15",
+    status: "전송완료",
+    usageStatus: "미사용"
+  },
+  {
+    id: 2,
+    memberName: "김철수",
+    memberDept: "개발",
+    productName: "헬스장 1개월 이용권",
+    points: 50000,
+    giftDate: "2024-12-14",
+    status: "전송완료",
+    usageStatus: "사용중"
+  },
+  {
+    id: 3,
+    memberName: "이영희",
+    memberDept: "디자인",
+    productName: "요가 그룹레슨 15회",
+    points: 180000,
+    giftDate: "2024-12-13",
+    status: "전송완료",
+    usageStatus: "사용완료"
+  }
+];

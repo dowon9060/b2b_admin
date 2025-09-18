@@ -57,8 +57,8 @@ function AdminLayout({ members, setMembers, handleAddMember, handleUpdateMember,
           <Route path="/" element={<Dashboard members={members} />} />
           <Route path="/members" element={<MemberList members={members} setMembers={setMembers} />} />
           <Route path="/members/new" element={<MemberDetail members={members} onUpdate={handleAddMember} />} />
-          <Route path="/members/:id" element={<MemberDetail members={members} onUpdate={handleUpdateMember} />} />
-          <Route path="/gift" element={<GiftPage members={members} setMembers={setMembers} />} />
+          <Route path="/members/:id" element={<MemberDetail members={members} setMembers={setMembers} onUpdate={handleUpdateMember} companyPoints={companyPoints} handleRecoverPoints={handleRecoverPoints} />} />
+              <Route path="/gift" element={<GiftPage members={members} setMembers={setMembers} companyPoints={companyPoints} handleDeductCompanyPoints={handleDeductCompanyPoints} />} />
           <Route path="/charge" element={<PointCharge companyPoints={companyPoints} />} />
           <Route path="/charge/history/:month" element={<SettlementDetail />} />
           <Route path="/usage" element={<UsageTable />} />
