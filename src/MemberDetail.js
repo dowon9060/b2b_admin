@@ -315,8 +315,7 @@ function MemberDetail({ members, setMembers }) {
                     <td>{usage.usageDate}</td>
                     <td>{usage.points.toLocaleString()}P</td>
                     <td className="usage-period-cell">
-                      <div className="usage-period-label">이용권 기간</div>
-                      <div className="usage-period-date">{getUsagePeriod(usage.usageDate, usage.points)}</div>
+                      {getUsagePeriod(usage.usageDate, usage.points)}
                     </td>
                   </tr>
                 ))}
