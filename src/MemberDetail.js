@@ -8,6 +8,7 @@ function MemberDetail({ members, setMembers }) {
   const [member, setMember] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   useEffect(() => {
     const foundMember = members.find(m => m.id === parseInt(id));
@@ -38,6 +39,21 @@ function MemberDetail({ members, setMembers }) {
 
   const handleInputChange = (field, value) => {
     setEditData({ ...editData, [field]: value });
+  };
+
+  const handlePasswordReset = async () => {
+    setIsResettingPassword(true);
+    
+    try {
+      // 실제 앱에서는 비밀번호 초기화 API 호출
+      await new Promise(resolve => setTimeout(resolve, 1500)); // 시뮬레이션
+      
+      alert(`${member.name}님의 비밀번호가 초기화되었습니다.\n\n초기화 비밀번호: dagym1\n\n해당 비밀번호로 로그인 후 비밀번호를 변경하도록 안내해주세요.`);
+    } catch (error) {
+      alert('비밀번호 초기화 중 오류가 발생했습니다. 다시 시도해 주세요.');
+    } finally {
+      setIsResettingPassword(false);
+    }
   };
 
   if (!member) {
@@ -203,7 +219,18 @@ function MemberDetail({ members, setMembers }) {
           </div>
           
           <div className="form-group">
-            <label>이메일</label>
+            <div className="email-header">
+              <label>이메일(아이디)</label>
+              {!isEditing && (
+                <button
+                  className="btn btn-warning btn-sm"
+                  onClick={handlePasswordReset}
+                  disabled={isResettingPassword}
+                >
+                  {isResettingPassword ? '초기화 중...' : '비밀번호 초기화'}
+                </button>
+              )}
+            </div>
             {isEditing ? (
               <input
                 type="email"
