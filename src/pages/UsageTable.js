@@ -131,21 +131,23 @@ function UsageTable() {
             </button>
           </div>
 
-          <div className="form-row">
+          <div className="form-group">
             <label>기간 지정</label>
-            <div className="date-range">
+            <div className="date-range-row">
               <input
                 type="date"
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
                 className="form-control"
+                placeholder="시작일"
               />
-              <span>~</span>
+              <span className="date-separator">~</span>
               <input
                 type="date"
                 value={endDate}
                 onChange={e => setEndDate(e.target.value)}
                 className="form-control"
+                placeholder="종료일"
               />
             </div>
           </div>
@@ -165,7 +167,6 @@ function UsageTable() {
                   <th>구성원</th>
                   <th>부서</th>
                   <th>이용일</th>
-                  <th>시설명</th>
                   <th>포인트</th>
                   <th>금액</th>
                 </tr>
@@ -176,7 +177,6 @@ function UsageTable() {
                     <td>{usage.memberName}</td>
                     <td>{usage.department}</td>
                     <td>{usage.usageDate}</td>
-                    <td>{usage.facility}</td>
                     <td>{formatNumber(usage.points)}P</td>
                     <td>{formatNumber(usage.amount)}원</td>
                   </tr>
@@ -220,7 +220,6 @@ function UsageTable() {
                           <div className="usage-info">
                             <div className="usage-member">{usage.memberName}</div>
                             <div className="usage-details">
-                              <span>시설: {usage.facility}</span>
                               <span>포인트: {formatNumber(usage.points)}P</span>
                               <span>금액: {formatNumber(usage.amount)}원</span>
                             </div>
