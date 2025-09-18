@@ -9,6 +9,7 @@ import { ApiProvider } from "./context/ApiContext";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(true); // 개발용으로 true로 설정
   const [members, setMembers] = useState(initialMembers);
+  const [companyPoints, setCompanyPoints] = useState(1500000); // 기업 보유포인트 (초기값: 150만P)
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -23,6 +24,19 @@ function App() {
     setMembers(members.map(m => 
       m.id === updatedMember.id ? updatedMember : m
     ));
+  };
+
+  // 구성원 포인트 회수 (기업 보유포인트로 반환)
+  const handleRecoverPoints = (memberId, recoverAmount) => {
+    setMembers(members.map(m =>
+      m.id === memberId ? { ...m, point: m.point - recoverAmount } : m
+    ));
+    setCompanyPoints(prev => prev + recoverAmount);
+  };
+
+  // 기업 보유포인트 차감 (포인트 지급 시 사용)
+  const handleDeductCompanyPoints = (amount) => {
+    setCompanyPoints(prev => prev - amount);
   };
 
   return (
