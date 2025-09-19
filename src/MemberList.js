@@ -12,7 +12,7 @@ function MemberList({ members, setMembers }) {
   const [viewMode, setViewMode] = useState("list"); // "list" 또는 "department"
   const [collapsedDepts, setCollapsedDepts] = useState({}); // 접힌 부서들
   const navigate = useNavigate();
-  const { toasts, removeToast, success, error, warning, info } = useToast();
+  const { toasts, removeToast, success, warning } = useToast();
 
   // 필터링
   const filtered = members.filter(
@@ -509,11 +509,7 @@ function MemberList({ members, setMembers }) {
             </div>
             
             <div className="card-content">
-              <div className="card info-card">
-                <span>선택된 임직원: <strong>{selected.length}명</strong></span>
-              </div>
-
-              <div className="card">
+              <div>
                 <h4>기간 설정</h4>
                 <div className="form-row">
                   <div className="form-group">
@@ -537,7 +533,7 @@ function MemberList({ members, setMembers }) {
                 </div>
               </div>
 
-              <div className="card">
+              <div>
                 <h4>분기 설정</h4>
                 <select
                   value={bulkPointData.quarter}
@@ -551,7 +547,7 @@ function MemberList({ members, setMembers }) {
                 </select>
               </div>
 
-              <div className="card">
+              <div>
                 <h4>포인트 선택</h4>
                 <div className="point-amount-controls">
                   <div className="button-group">
