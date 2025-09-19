@@ -144,7 +144,7 @@ function UsageTable() {
             </select>
             
             <button onClick={handleReset} className="btn btn-secondary">
-              필터 초기화
+              초기화
             </button>
           </div>
 

@@ -198,39 +198,51 @@ function GiftPage({ members, setMembers, companyPoints = 1500000, handleDeductCo
   );
 
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <h2>선물하기</h2>
-        <p>임직원에게 다짐의 운동 상품을 선물하세요</p>
-      </div>
-
-      {/* 탭 네비게이션 */}
-      <div className="card">
-        <div className="card-content">
-          <div className="tab-navigation">
-            <button
-              className={`tab-button ${activeTab === "products" ? "active" : ""}`}
-              onClick={() => setActiveTab("products")}
-            >
-              상품 선택
-            </button>
-            <button
-              className={`tab-button ${activeTab === "history" ? "active" : ""}`}
-              onClick={() => setActiveTab("history")}
-            >
-              선물 내역
-            </button>
-          </div>
+    <div className="gift-page-wrapper">
+      {/* 서비스 준비중 오버레이 */}
+      <div className="service-preparing-overlay">
+        <div className="service-preparing-content">
+          <div className="service-preparing-icon">🚀</div>
+          <h2>서비스 준비중</h2>
+          <p>더 나은 서비스로 찾아뵙겠습니다</p>
+          <p className="contact-info">문의사항은 <strong>다짐</strong>에 연락 주세요</p>
         </div>
       </div>
+      
+      {/* 기존 페이지 내용 (블러 처리됨) */}
+      <div className="page-container gift-page-blurred">
+        <div className="page-header">
+          <h2>선물하기</h2>
+          <p>임직원에게 다짐의 운동 상품을 선물하세요</p>
+        </div>
 
-      {/* 탭 컨텐츠 */}
-      {activeTab === "products" && renderProductsTab()}
-      {activeTab === "history" && renderHistoryTab()}
+        {/* 탭 네비게이션 */}
+        <div className="card">
+          <div className="card-content">
+            <div className="tab-navigation">
+              <button
+                className={`tab-button ${activeTab === "products" ? "active" : ""}`}
+                onClick={() => setActiveTab("products")}
+              >
+                상품 선택
+              </button>
+              <button
+                className={`tab-button ${activeTab === "history" ? "active" : ""}`}
+                onClick={() => setActiveTab("history")}
+              >
+                선물 내역
+              </button>
+            </div>
+          </div>
+        </div>
 
-      {/* 수신자 선택 모달 */}
-      {showRecipientModal && selectedProduct && (
-        <div className="modal-overlay" onClick={() => setShowRecipientModal(false)}>
+        {/* 탭 컨텐츠 */}
+        {activeTab === "products" && renderProductsTab()}
+        {activeTab === "history" && renderHistoryTab()}
+
+        {/* 수신자 선택 모달 */}
+        {showRecipientModal && selectedProduct && (
+          <div className="modal-overlay" onClick={() => setShowRecipientModal(false)}>
           <div className="card modal-card large-modal" onClick={(e) => e.stopPropagation()}>
             <div className="card-header">
               <h3>선물 받을 임직원 선택</h3>
@@ -339,6 +351,7 @@ function GiftPage({ members, setMembers, companyPoints = 1500000, handleDeductCo
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
