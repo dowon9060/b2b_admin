@@ -2180,12 +2180,12 @@ body {
 .selected-members-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-3);
+  gap: var(--spacing-2);
   padding: var(--spacing-2);
 }
 
 .selected-members-list.scrollable {
-  max-height: 350px;
+  max-height: 280px;
   overflow-y: auto;
   padding-right: var(--spacing-3);
 }
@@ -2193,106 +2193,101 @@ body {
 .selected-member-item {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  padding: var(--spacing-4);
+  align-items: center;
+  padding: var(--spacing-3);
   background: var(--gray-50);
   border: 1px solid var(--gray-200);
-  border-radius: var(--radius-lg);
-  transition: all 0.3s ease;
-  min-height: 80px;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  min-height: 60px;
 }
 
 .selected-member-item:hover {
-  background: var(--primary-50);
-  border-color: var(--primary-300);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  background: var(--gray-100);
+  border-color: var(--gray-300);
 }
 
 .selected-member-item .member-info {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-4);
   min-width: 0;
 }
 
 .selected-member-item .member-name {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--gray-900);
-  font-size: var(--font-size-lg);
-  line-height: 1.4;
-  margin-bottom: var(--spacing-1);
+  font-size: var(--font-size-base);
+  min-width: 80px;
 }
 
 .selected-member-item .member-details {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1);
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-3);
   font-size: var(--font-size-sm);
 }
 
 .selected-member-item .member-detail-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-1) 0;
+  gap: var(--spacing-2);
 }
 
 .selected-member-item .member-dept {
-  font-weight: 600;
-  color: var(--primary-600);
-  background: var(--primary-100);
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
+  color: var(--gray-600);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
 }
 
 .selected-member-item .member-empno {
-  color: var(--gray-600);
-  font-weight: 500;
+  color: var(--gray-500);
+  font-weight: 400;
+  font-size: var(--font-size-xs);
 }
 
 .selected-member-item .member-points {
-  color: var(--success-600);
-  font-weight: 700;
+  color: var(--gray-700);
+  font-weight: 600;
   font-size: var(--font-size-sm);
 }
 
 .selected-member-item .btn {
-  min-width: 36px;
-  height: 36px;
+  min-width: 32px;
+  height: 32px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
-  margin-left: var(--spacing-3);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
+  margin-left: var(--spacing-2);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
 }
 
 .selected-member-item .btn:hover {
   background: var(--danger-100);
   border-color: var(--danger-400);
   color: var(--danger-700);
-  transform: scale(1.05);
 }
 
 /* 스크롤바 스타일링 */
 .selected-members-list.scrollable::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .selected-members-list.scrollable::-webkit-scrollbar-track {
   background: var(--gray-100);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
 }
 
 .selected-members-list.scrollable::-webkit-scrollbar-thumb {
   background: var(--gray-400);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
 }
 
 .selected-members-list.scrollable::-webkit-scrollbar-thumb:hover {
@@ -2303,23 +2298,24 @@ body {
 .bulk-point-modal .card-content {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-6);
-  padding: var(--spacing-6);
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
 }
 
 .bulk-point-modal .card {
   margin-bottom: var(--spacing-2);
+  border-radius: var(--radius-md);
 }
 
 .bulk-point-modal .card h4 {
-  margin-bottom: var(--spacing-4);
+  margin-bottom: var(--spacing-3);
   font-size: var(--menu-small-size);
   font-weight: var(--font-weight-semibold);
   color: var(--gray-900);
 }
 
 .bulk-point-modal .form-group {
-  margin-bottom: var(--spacing-4);
+  margin-bottom: var(--spacing-3);
 }
 
 .bulk-point-modal .form-group:last-child {
@@ -2332,8 +2328,9 @@ body {
 
 .bulk-point-modal .summary-card {
   background: var(--gray-50);
-  border: 2px solid var(--gray-200);
-  padding: var(--spacing-5);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-3);
 }
 
 .bulk-point-modal .summary-item {
